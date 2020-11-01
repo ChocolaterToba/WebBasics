@@ -25,3 +25,36 @@ nav {
 .account-info > :first-child {
     margin-top: auto;
 }
+
+.top-bar > * {
+    display: inline;
+}
+
+.question-block {
+    border: 0.2rem solid black;
+}
+
+.avatar-likes {
+    display: inline-block;
+}
+
+.likes-box {
+    border: 0.1rem solid black;
+    display: inline-block;
+    height: 2rem;
+}
+
+.likes-box > * {
+    display: inline;
+    height: 110%;
+    margin-top: -0.1rem;
+}
+
+.likes-buttons > img {
+    display: block;
+}
+
+.vertical-line {
+    width: 0.05rem;
+    background-color: black;
+}
