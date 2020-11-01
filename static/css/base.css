@@ -1,5 +1,5 @@
 main {
-    padding-top: 2rem;
+    padding-top: 1rem;
 }
 
 nav {
@@ -11,7 +11,7 @@ nav {
 }
 
 .avatar-image {
-    height: 3.5rem;
+    height: 3rem;
     max-width: 6rem;
 }
 
@@ -38,23 +38,16 @@ nav {
     display: inline-block;
 }
 
-.likes-box {
-    border: 0.1rem solid black;
-    display: inline-block;
-    height: 2rem;
+.question-body {
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
-.likes-box > * {
-    display: inline;
-    height: 110%;
-    margin-top: -0.1rem;
-}
-
-.likes-buttons > img {
-    display: block;
-}
-
-.vertical-line {
-    width: 0.05rem;
-    background-color: black;
+.nav-buttons > button {
+    margin-right: 1rem;
+    border-radius: 0.25rem !important;
+    background-color: white;
+    color: black;
+    border-color: black;
 }
