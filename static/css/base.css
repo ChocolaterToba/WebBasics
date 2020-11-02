@@ -29,25 +29,3 @@ nav {
 .top-bar > * {
     display: inline;
 }
-
-.question-block {
-    border: 0.2rem solid black;
-}
-
-.avatar-likes {
-    display: inline-block;
-}
-
-.question-body {
-    min-width: 0;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-}
-
-.nav-buttons > button {
-    margin-right: 1rem;
-    border-radius: 0.25rem !important;
-    background-color: white;
-    color: black;
-    border-color: black;
-}
