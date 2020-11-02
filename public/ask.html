@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
-    <title>Question</title>
+    <title>Ask a question</title>
 
     <!-- Bootstrap core CSS -->
 <link href="../static/bootstrap-4.5.3-dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -28,7 +28,7 @@
     </style>
     <!-- Custom styles -->
     <link href="../static/css/base.css" rel="stylesheet">
-    <link href="../static/css/question.css" rel="stylesheet">
+    <link href="../static/css/ask.css" rel="stylesheet">
   </head>
   <body>
     <nav class="navbar navbar-expand-sm navbar-light bg-light">
@@ -61,7 +61,30 @@
     <main class="container">
       <div class="row">
         <div class="col-10 main-content">
-          <p>Main content here</p>
+          <ul class="list-unstyled">
+            <li class="top-bar mb-3">
+              <h3 class="pr-2">New Question</h3>
+            </li>
+            <form>
+              <div class="form-row my-1">
+                <label for="title" class="col-form-label col-sm-1 mr-1">Title</label>
+                <input type="text" class="right-col form-control col-sm-10" id="title" placeholder="Title">
+              </div>
+              <div class="form-row my-1">
+                <label for="question-text" class="col-form-label col-sm-1 mr-1">Text</label>
+                <textarea class="right-col form-control col-sm-10" id="exampleFormControlTextarea1" rows="10" placeholder="Text"></textarea>
+              </div>
+              <div class="form-row my-1">
+                <label for="question-tags" class="col-form-label col-sm-1 mr-1">Tags</label>
+                <input type="text" class="right-col form-control col-sm-10" id="question-tags" placeholder="Tags">
+              </div>
+              <div class="form-row">
+                <div class="col-sm-1 mr-1"></div>
+                <button type="submit" class="right-col btn btn-outline-dark">Ask!</button>
+              </div>
+            </form>
+            </li>
+          </ul>
         </div>
         <div class="col-2 sidebar">
           <div class="tags-wrap">
