@@ -1,0 +1,17 @@
+.question-block > .avatar-likes > .avatar-image {
+    height: 5rem;
+}
+
+.question-body, .answer-body {
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+hr {
+    background-color: black;
+}
+
+.answer-block {
+    border: 0.1rem solid black;
+}
