@@ -26,9 +26,10 @@
         }
       }
     </style>
-    <!-- Custom styles -->
+    <!-- Custom styles and scripts -->
     <link href="../static/css/base.css" rel="stylesheet">
-    <link href="../static/css/login.css" rel="stylesheet">
+    <link href="../static/css/register.css" rel="stylesheet">
+    <script type="text/javascript" src="../static/js/register.js" charset="UTF-8"></script>
   </head>
   <body>
     <nav class="navbar navbar-expand-sm navbar-light bg-light">
@@ -63,24 +64,43 @@
         <div class="col-10 main-content">
           <ul class="list-unstyled mr-5">
             <li class="top-bar mb-3">
-              <h3 class="pr-2">Log In</h3>
+              <h3 class="pr-2">Register</h3>
             </li>
             <li>
-              <p class="warning">Sorry, wrong password!</p>
+              <p class="warning">Sorry, this email address is already registered!</p>
             </li>
             <li class="mb-3">
-              <form>
+              <form enctype="multipart/form-data">
                 <div class="form-row mb-2">
                   <label for="login" class="col-form-label col-sm-2 mr-1">Login</label>
-                  <input type="text" class="right-col form-control col-sm-5" id="login" placeholder="Enter your login here">
+                  <input type="text" class="right-col form-control col-sm-5" id="login" placeholder="example_login">
+                </div>
+                <div class="form-row mb-2">
+                  <label for="email" class="col-form-label col-sm-2 mr-1">Email</label>
+                  <input type="email" class="right-col form-control col-sm-5" id="email" placeholder="example@mail.ru">
+                </div>
+                <div class="form-row mb-4">
+                  <label for="nickname" class="col-form-label col-sm-2 mr-1">Nickname</label>
+                  <input type="text" class="right-col form-control col-sm-5" id="nickname" placeholder="Example Nickname">
                 </div>
                 <div class="form-row mb-3">
                   <label for="password" class="col-form-label col-sm-2 mr-1">Password</label>
                   <input type="password" class="right-col form-control col-sm-5" id="password" placeholder="********">
                 </div>
-                <div class="form-row">
+                <div class="form-row mb-3">
+                  <label for="passwordRepeat" class="col-form-label col-sm-2 mr-1">Repeat password</label>
+                  <input type="password" class="right-col form-control col-sm-5" id="passwordRepeat" placeholder="********">
+                </div>
+                <div class="form-row mb-3">
+                  <label for="avatar" class="custom-file-upload col-form-label col-sm-2 mr-1">Upload avatar</label>
+                  <div id="fileButton" class="right-col form-control col-sm-5" onclick="getFile()">Click to upload a file</div>
+                  <div style='height: 0px;width: 0px; overflow:hidden;'>
+                    <input id="upfile" type="file" value="upload" onchange="sub(this)" />
+                  </div>
+                </div>
+                <div class="form-row mb-3">
                   <div class="col-sm-2 mr-1"></div>
-                  <button type="submit" class="right-col btn btn-outline-dark">Log in!</button>
+                  <button type="submit" class="right-col btn btn-outline-dark">Register!</button>
                 </div>
               </form>
             </li>

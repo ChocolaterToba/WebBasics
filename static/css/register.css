@@ -5,3 +5,8 @@
 .warning {
     color: red;
 }
+
+#fileButton {
+    
+    cursor: pointer;
+}
