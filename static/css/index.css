@@ -2,14 +2,14 @@
     border: 0.2rem solid black;
 }
 
-.avatar-likes {
-    display: inline-block;
-}
-
 .question-body {
     min-width: 0;
     overflow-wrap: break-word;
     word-wrap: break-word;
+}
+
+.likes-box > img {
+    cursor: pointer;
 }
 
 .nav-buttons > button {
