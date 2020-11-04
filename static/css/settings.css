@@ -1,0 +1,8 @@
+.right-col {
+    border: 0.1rem solid black;
+}
+
+#newAvatarImage {
+    height: 5rem;
+    max-width: 7rem;
+}

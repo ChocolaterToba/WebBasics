@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
-    <title>Register</title>
+    <title>Sign Up</title>
 
     <!-- Bootstrap core CSS -->
 <link href="../static/bootstrap-4.5.3-dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -28,34 +28,19 @@
     </style>
     <!-- Custom styles and scripts -->
     <link href="../static/css/base.css" rel="stylesheet">
-    <link href="../static/css/register.css" rel="stylesheet">
-    <script type="text/javascript" src="../static/js/register.js" charset="UTF-8"></script>
+    <link href="../static/css/signup.css" rel="stylesheet">
+    <script type="text/javascript" src="../static/js/fileInput.js" charset="UTF-8"></script>
   </head>
   <body>
     <nav class="navbar navbar-expand-sm navbar-light bg-light">
-      <a class="navbar-brand" href="#">Ask Mikhail</a>
-        
+      <a class="navbar-brand" href="index.html">Ask Mikhail</a>
       <div class="collapse navbar-collapse">
         <form class="search-form form-inline flex-grow-1 d-flex justify-content-center">
           <input class="search-bar w-50 form-control mr-2 flex-shrink-1" type="search" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-success my-2 mr-2" type="submit">Search</button>
         </form>
-        <ul class="navbar-nav list-inline">
-          <li>
-            <a class="nav-link p-0" href="#">
-              <img src="../img/Toba.jpg" class="avatar-image" alt="avatar image">
-            </a>
-          </li>
-          <li>
-            <ul class="account-info list-unstyled ml-2">
-              <li class="account-name">AccountName</li>
-              <li>
-                <a class="setting-link" href="#">Settings</a>
-                <a class="logout-link" href="#">LogOut</a>
-              </li>
-            </ul>
-          </li>
-        </ul>
+        <a class="log-in-link mr-3" href="login.html">Log in</a>
+        <a class="sign-up-link" href="signup.html">Sign up</a>
       </div>
     </nav>
 
@@ -64,7 +49,7 @@
         <div class="col-10 main-content">
           <ul class="list-unstyled mr-5">
             <li class="top-bar mb-3">
-              <h3 class="pr-2">Register</h3>
+              <h3 class="pr-2">Registration</h3>
             </li>
             <li>
               <p class="warning">Sorry, this email address is already registered!</p>
@@ -93,9 +78,9 @@
                 </div>
                 <div class="form-row mb-3">
                   <label for="avatar" class="custom-file-upload col-form-label col-sm-3 col-md-2 mr-1">Upload avatar</label>
-                  <div id="fileButton" class="right-col form-control col-sm-5" onclick="getFile()">Click to upload a file</div>
+                  <div id="fileButton" class="right-col form-control col-sm-5" onclick="getFile()">Click to upload an avatar</div>
                   <div style='height: 0px;width: 0px; overflow:hidden;'>
-                    <input id="upfile" type="file" value="upload" onchange="sub(this)" />
+                    <input id="avatar" type="file" value="upload" onchange="sub(this)" />
                   </div>
                 </div>
                 <div class="form-row mb-3">
@@ -103,10 +88,6 @@
                   <button type="submit" class="right-col btn btn-outline-dark">Register!</button>
                 </div>
               </form>
-            </li>
-            <li class="row">
-              <div class="col-sm-3 col-md-2 mr-2"></div>
-              <a href="register.html">create new account</a>
             </li>
           </ul>
         </div>

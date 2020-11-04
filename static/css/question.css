@@ -1,4 +1,4 @@
-.question-block > .avatar-likes > .avatar-image {
+#questionAvatar {
     height: 5rem;
     max-width: 7rem;
 }
