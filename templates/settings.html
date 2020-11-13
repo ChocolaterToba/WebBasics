@@ -24,19 +24,19 @@
         <label for="email" class="col-form-label col-sm-3 col-md-2 mr-1">Email</label>
         <input type="email" class="right-col form-control col-sm-6" id="email" placeholder="example@mail.ru">
       </div>
-      <div class="form-row mb-4">
+      <div class="form-row mb-3">
         <label for="nickname" class="col-form-label col-sm-3 col-md-2 mr-1">Nickname</label>
         <input type="text" class="right-col form-control col-sm-6" id="nickname" placeholder="AccountName">
       </div>
       <div class="form-row mb-3">
         <label for="avatar" class="custom-file-upload col-form-label col-sm-3 col-md-2 mr-1">Upload avatar</label>
-        <img src="{% static 'img/Toba.jpg' %}" class="file-image avatar-image mr-2" alt="new avatar image">
+        <img src="{% static 'img/Toba.jpg' %}" class="file-image-preview mr-2" alt="new avatar image">
       </div>
       <div class="form-row mb-3">
         <div class="col-sm-3 col-md-2 mr-1"></div>
         <div id="fileButton" class="form-control right-col col-sm-6" onclick="getFile()">Click to upload an avatar</div>
         <div style='height: 0px;width: 0px; overflow:hidden;'>
-          <input id="avatar" type="file" value="upload" onchange="sub(this)" />
+          <input id="avatarFile" type="file" value="upload" onchange="sub(this)" />
         </div>
       </div>
       <div class="form-row mb-3">

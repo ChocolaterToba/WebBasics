@@ -6,11 +6,12 @@
     color: red;
 }
 
-#fileButton {  
-    cursor: pointer;
-}
-
-.file-image {
+.file-image-preview {
     height: 5rem;
     max-width: 7rem;
+}
+
+#fileButton {  
+    cursor: pointer;
+    overflow: hidden;
 }
