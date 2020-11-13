@@ -1,4 +1,5 @@
-{% extends 'inc/base_unlogged.html' %}
+{% extends user.logged_in|yesno:'inc/base_logged.html,inc/base_unlogged.html' %}
+
 {% load static %}
 
 {% block title %}
@@ -15,86 +16,8 @@
     <h3 class="pr-2">New Questions</h3>
     <a href="#">Hot Questions</a>
   </li>
-  <li class="question-block d-flex rounded pl-2 pt-1 pb-2 mb-2">
-    <div class="avatar-likes">
-      <img src="{% static 'img/Toba.jpg' %}", class="avatar-image", alt="avatar image">
-      <div class="likes-box d-flex flex-column align-items-center mt-2">
-        <img src="{% static 'img/caret-up.svg' %}" alt="like button">
-        <h4 class="likes-amount m-0">51</h4>
-        <img src="{% static 'img/caret-down.svg' %}" alt="dislike button">
-      </div>
-    </div>
-    <div class="question-body flex-grow-1 d-flex flex-column ml-3">
-      <a href="/question/"><h3>Example title</h3></a>
-      <p>osofjseofsofsdokfosdkfosdfkosdkfok</p>
-      <div class="bottom-info d-inline-flex align-items-end">
-        <a href="/question/" class="mr-2">Answers (420)</a>
-        <ul class="list-unstyled">
-          <li>Published: 11.09.2001</li>
-          <li>
-            <ul class="list-inline list-inline-item">
-              <li class="list-inline-item">Tags:</li>
-              <li class="list-inline-item"><a href="#">Tag1</a></li>
-              <li class="list-inline-item"><a href="#">Tag2</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </li>
-  <li class="question-block d-flex rounded pl-2 pt-1 pb-2 mb-2">
-    <div class="avatar-likes">
-      <img src="{% static 'img/Toba.jpg' %}", class="avatar-image", alt="avatar image">
-      <div class="likes-box d-flex flex-column align-items-center mt-2">
-        <img src="{% static 'img/caret-up.svg' %}" alt="like button">
-        <h4 class="likes-amount m-0">51</h4>
-        <img src="{% static 'img/caret-down.svg' %}" alt="dislike button">
-      </div>
-    </div>
-    <div class="question-body flex-grow-1 d-flex flex-column ml-3">
-      <a href="/question/"><h3>Example title</h3></a>
-      <p>osofjseofsofsdokfosdkfosdfkosdkfok</p>
-      <div class="bottom-info d-inline-flex align-items-end">
-        <a href="/question/" class="mr-2">Answers (420)</a>
-        <ul class="list-unstyled">
-          <li>Published: 11.09.2001</li>
-          <li>
-            <ul class="list-inline list-inline-item">
-              <li class="list-inline-item">Tags:</li>
-              <li class="list-inline-item"><a href="#">Tag1</a></li>
-              <li class="list-inline-item"><a href="#">Tag2</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </li>
-  <li class="question-block d-flex rounded pl-2 pt-1 pb-2 mb-2">
-    <div class="avatar-likes">
-      <img src="{% static 'img/Toba.jpg' %}", class="avatar-image", alt="avatar image">
-      <div class="likes-box d-flex flex-column align-items-center mt-2">
-        <img src="{% static 'img/caret-up.svg' %}" alt="like button">
-        <h4 class="likes-amount m-0">51</h4>
-        <img src="{% static 'img/caret-down.svg' %}" alt="dislike button">
-      </div>
-    </div>
-    <div class="question-body flex-grow-1 d-flex flex-column ml-3">
-      <a href="/question/"><h3>Example title</h3></a>
-      <p>osofjseofsofsdokfosdkfosdfkosdkfok</p>
-      <div class="bottom-info d-inline-flex align-items-end">
-        <a href="/question/" class="mr-2">Answers (420)</a>
-        <ul class="list-unstyled">
-          <li>Published: 11.09.2001</li>
-          <li>
-            <ul class="list-inline list-inline-item">
-              <li class="list-inline-item">Tags:</li>
-              <li class="list-inline-item"><a href="#">Tag1</a></li>
-              <li class="list-inline-item"><a href="#">Tag2</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </li>
+  {% for question in questions %}
+    {% include 'inc/one_question.html' %}
+  {% endfor %}
 </ul>
 {% endblock content %}

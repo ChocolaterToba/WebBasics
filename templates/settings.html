@@ -16,21 +16,21 @@
 {% block content %}
 <ul class="list-unstyled mr-5">
   <li class="top-bar mb-3">
-    <h3 class="pr-2">Settings: AccountName</h3>
+    <h3 class="pr-2">Settings: {{ user.username }}</h3>
   </li>
   <li class="mb-3">
     <form enctype="multipart/form-data">
       <div class="form-row mb-2">
         <label for="login" class="col-form-label col-sm-3 col-md-2 mr-1">Login</label>
-        <input type="text" class="right-col form-control col-sm-6" id="login" placeholder="Example Login">
+        <input type="text" class="right-col form-control col-sm-6" id="login" placeholder={{ user.login }}>
       </div>
       <div class="form-row mb-2">
         <label for="email" class="col-form-label col-sm-3 col-md-2 mr-1">Email</label>
-        <input type="email" class="right-col form-control col-sm-6" id="email" placeholder="example@mail.ru">
+        <input type="email" class="right-col form-control col-sm-6" id="email" placeholder={{ user.e_mail }}>
       </div>
       <div class="form-row mb-3">
         <label for="nickname" class="col-form-label col-sm-3 col-md-2 mr-1">Nickname</label>
-        <input type="text" class="right-col form-control col-sm-6" id="nickname" placeholder="AccountName">
+        <input type="text" class="right-col form-control col-sm-6" id="nickname" placeholder={{ user.username }}>
       </div>
       <div class="form-row mb-3">
         <label for="avatar" class="custom-file-upload col-form-label col-sm-3 col-md-2 mr-1">Upload avatar</label>

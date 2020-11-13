@@ -1,4 +1,4 @@
-{% extends 'inc/base_unlogged.html' %}
+{% extends user.logged_in|yesno:'inc/base_logged.html,inc/base_unlogged.html' %}
 {% load static %}
 
 {% block title %}
@@ -11,77 +11,13 @@
 
 {% block content %}
 <ul class="list-unstyled mr-5">
-  <li class="question-block d-flex rounded pl-2 pt-1 pb-2 mb-2">
-    <div class="avatar-likes">
-      <img src="{% static 'img/Toba.jpg' %}" class="avatar-image" id="questionAvatar" alt="avatar image">
-      <div class="likes-box d-flex flex-column align-items-center mt-2">
-        <img src="{% static 'img/caret-up.svg' %}" alt="like button">
-        <h4 class="likes-amount m-0">51</h4>
-        <img src="{% static 'img/caret-down.svg' %}" alt="dislike button">
-      </div>
-    </div>
-    <div class="question-body flex-grow-1 d-flex flex-column ml-3">
-      <h3>Example title</h3>
-      <p>texttexttext</p>
-      <p>moremoremoremoremoremoremore</p>
-      <div class="bottom-info d-inline-flex align-items-end">
-        <a href="#answers-start" class="mr-2">answers (420)</a>
-        <ul class="list-unstyled">
-          <li>Published: 11.09.2001</li>
-          <li>
-            <ul class="list-inline list-inline-item">
-              <li class="list-inline-item">Tags:</li>
-              <li class="list-inline-item"><a href="#">Tag1</a></li>
-              <li class="list-inline-item"><a href="#">Tag2</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </li>
+  {% include 'inc/one_question.html' %}
   <li>
     <hr id="answers-start">
   </li>
-  <li class="answer-block d-flex rounded pl-2 pt-1 pb-2 mb-3">
-    <div class="avatar-likes">
-      <img src="{% static 'img/Toba.jpg' %}" class="avatar-image" alt="avatar image">
-      <div class="likes-box d-flex flex-column align-items-center mt-2">
-        <img src="{% static 'img/caret-up.svg' %}" alt="like button">
-        <h4 class="likes-amount m-0">51</h4>
-        <img src="{% static 'img/caret-down.svg' %}" alt="dislike button">
-      </div>
-    </div>
-    <div class="answer-body flex-grow-1 d-flex flex-column ml-3">
-      <p>texttexttext</p>
-      <p>moremoremoremoremoremoremore</p>
-      <div class="bottom-info d-inline-flex align-items-end">
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="checkboxQuestion1" value="option1">
-          <label class="form-check-label" for="checkboxQuestion1">Correct!</label>
-        </div>
-      </div>
-    </div>
-  </li>
-  <li class="answer-block d-flex rounded pl-2 pt-1 pb-2 mb-3">
-    <div class="avatar-likes">
-      <img src="{% static 'img/Toba.jpg' %}" class="avatar-image" alt="avatar image">
-      <div class="likes-box d-flex flex-column align-items-center mt-2">
-        <img src="{% static 'img/caret-up.svg' %}" alt="like button">
-        <h4 class="likes-amount m-0">51</h4>
-        <img src="{% static 'img/caret-down.svg' %}" alt="dislike button">
-      </div>
-    </div>
-    <div class="answer-body flex-grow-1 d-flex flex-column ml-3">
-      <p>texttexttext</p>
-      <p>moremoremoremoremoremoremore</p>
-      <div class="bottom-info d-inline-flex align-items-end">
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="checkboxQuestion1" value="option1">
-          <label class="form-check-label" for="checkboxQuestion1">Correct!</label>
-        </div>
-      </div>
-    </div>
-  </li>
+  {% for answer in answers %}
+    {% include 'inc/one_answer.html' %}
+  {% endfor %}
   <li>
     <hr>
   </li>

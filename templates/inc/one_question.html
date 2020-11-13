@@ -1,0 +1,32 @@
+{% load static %}
+
+<li class="question-block d-flex rounded pl-2 pt-1 pb-2 mb-2">
+  <div class="avatar-likes">
+    <img src="{% static 'img/Toba.jpg' %}", class="avatar-image", alt="avatar image">
+    <div class="likes-box d-flex flex-column align-items-center mt-2">
+      <img src="{% static 'img/caret-up.svg' %}" alt="like button">
+      <h4 class="likes-amount m-0">{{ question.likes }}</h4>
+      <img src="{% static 'img/caret-down.svg' %}" alt="dislike button">
+    </div>
+  </div>
+  <div class="question-body flex-grow-1 d-flex flex-column ml-3">
+    <a href="/question/{{ question.id }}/"><h3>{{ question.title }}</h3></a>
+    <p>{{ question.text }}</p>
+    <div class="bottom-info mt-auto mb-1 d-inline-flex align-items-end">
+      <a href="/question/#answersStart" class="mr-2">Answers ({{ question.answers_amount }})</a>
+      <ul class="list-unstyled">
+        <li>Published: {{ question.published_date }}</li>
+        <li>
+          <ul class="list-inline list-inline-item">
+              <li class="list-inline-item">Tags:</li>
+              {% for tag in question.tags %}
+              <li class="list-inline-item">
+                  <a href="#">{{ tag }}</a>
+              </li>
+              {% endfor %}
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</li>
