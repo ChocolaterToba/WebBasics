@@ -1,0 +1,13 @@
+<nav class="navbar navbar-expand-sm navbar-light bg-light">
+  <a class="navbar-brand" href="/index/">Ask Mikhail</a>
+  <div class="collapse navbar-collapse">
+    <form class="search-form form-inline flex-grow-1 d-flex justify-content-center">
+      <input class="search-bar w-50 form-control mr-2 flex-shrink-1" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 mr-2" type="submit">Search</button>
+    </form>
+    <ul class="navbar-nav list-inline">
+      {% block navbar-user %}
+      {% endblock navbar-user %}
+    </ul>
+  </div>
+</nav>

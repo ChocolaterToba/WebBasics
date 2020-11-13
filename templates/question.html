@@ -1,155 +1,94 @@
+{% extends 'inc/base_unlogged.html' %}
+{% load static %}
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <title>Question</title>
+{% block styles %}
+<link href="{% static 'css/question.css' %}" rel="stylesheet">
+{% endblock styles %}
 
-    <!-- Bootstrap core CSS -->
-    <link href="../static/bootstrap-4.5.3-dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-
-    <!-- Custom styles -->
-    <link href="../static/css/base.css" rel="stylesheet">
-    <link href="../static/css/question.css" rel="stylesheet">
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-sm navbar-light bg-light">
-      <a class="navbar-brand" href="index.html">Ask Mikhail</a>
-      <div class="collapse navbar-collapse">
-        <form class="search-form form-inline flex-grow-1 d-flex justify-content-center">
-          <input class="search-bar w-50 form-control mr-2 flex-shrink-1" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success my-2 mr-2" type="submit">Search</button>
-        </form>
-        <ul class="navbar-nav list-inline">
+{% block content %}
+<ul class="list-unstyled mr-5">
+  <li class="question-block d-flex rounded pl-2 pt-1 pb-2 mb-2">
+    <div class="avatar-likes">
+      <img src="{% static 'img/Toba.jpg' %}" class="avatar-image" id="questionAvatar" alt="avatar image">
+      <div class="likes-box d-flex flex-column align-items-center mt-2">
+        <img src="{% static 'img/caret-up.svg' %}" alt="like button">
+        <h4 class="likes-amount m-0">51</h4>
+        <img src="{% static 'img/caret-down.svg' %}" alt="dislike button">
+      </div>
+    </div>
+    <div class="question-body flex-grow-1 d-flex flex-column ml-3">
+      <h3>Example title</h3>
+      <p>texttexttext</p>
+      <p>moremoremoremoremoremoremore</p>
+      <div class="bottom-info d-inline-flex align-items-end">
+        <a href="#answers-start" class="mr-2">answers (420)</a>
+        <ul class="list-unstyled">
+          <li>Published: 11.09.2001</li>
           <li>
-            <a class="nav-link p-0" href="#">
-              <img src="../img/Toba.jpg" class="avatar-image" alt="avatar image">
-            </a>
-          </li>
-          <li>
-            <ul class="account-info list-unstyled ml-2">
-              <li class="account-name">AccountName</li>
-              <li>
-                <a id="settings-link" href="settings.html">Settings</a>
-                <a id="logout-link" href="#">LogOut</a>
-              </li>
+            <ul class="list-inline list-inline-item">
+              <li class="list-inline-item">Tags:</li>
+              <li class="list-inline-item"><a href="#">Tag1</a></li>
+              <li class="list-inline-item"><a href="#">Tag2</a></li>
             </ul>
           </li>
         </ul>
       </div>
-    </nav>
-
-    <main class="container">
-      <div class="row">
-        <div class="col-10 main-content">
-          <ul class="list-unstyled mr-5">
-            <li class="question-block d-flex rounded pl-2 pt-1 pb-2 mb-2">
-              <div class="avatar-likes">
-                <img src="../img/Toba.jpg" class="avatar-image" id="questionAvatar" alt="avatar image">
-                <div class="likes-box d-flex flex-column align-items-center mt-2">
-                  <img src="../img/caret-up.svg" alt="like button">
-                  <h4 class="likes-amount m-0">51</h4>
-                  <img src="../img/caret-down.svg" alt="dislike button">
-                </div>
-              </div>
-              <div class="question-body flex-grow-1 d-flex flex-column ml-3">
-                <h3>Example title</h3>
-                <p>texttexttext</p>
-                <p>moremoremoremoremoremoremore</p>
-                <div class="bottom-info d-inline-flex align-items-end">
-                  <a href="#" class="mr-2">answers (420)</a>
-                  <ul class="list-unstyled">
-                    <li>Published: 11.09.2001</li>
-                    <li>
-                      <ul class="list-inline list-inline-item">
-                        <li class="list-inline-item">Tags:</li>
-                        <li class="list-inline-item"><a href="#">Tag1</a></li>
-                        <li class="list-inline-item"><a href="#">Tag2</a></li>
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </li>
-            <li>
-              <hr>
-            </li>
-            <li class="answer-block d-flex rounded pl-2 pt-1 pb-2 mb-3">
-              <div class="avatar-likes">
-                <img src="../img/Toba.jpg" class="avatar-image" alt="avatar image">
-                <div class="likes-box d-flex flex-column align-items-center mt-2">
-                  <img src="../img/caret-up.svg" alt="like button">
-                  <h4 class="likes-amount m-0">51</h4>
-                  <img src="../img/caret-down.svg" alt="dislike button">
-                </div>
-              </div>
-              <div class="answer-body flex-grow-1 d-flex flex-column ml-3">
-                <p>texttexttext</p>
-                <p>moremoremoremoremoremoremore</p>
-                <div class="bottom-info d-inline-flex align-items-end">
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="checkboxQuestion1" value="option1">
-                    <label class="form-check-label" for="checkboxQuestion1">Correct!</label>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li class="answer-block d-flex rounded pl-2 pt-1 pb-2 mb-3">
-              <div class="avatar-likes">
-                <img src="../img/Toba.jpg" class="avatar-image" alt="avatar image">
-                <div class="likes-box d-flex flex-column align-items-center mt-2">
-                  <img src="../img/caret-up.svg" alt="like button">
-                  <h4 class="likes-amount m-0">51</h4>
-                  <img src="../img/caret-down.svg" alt="dislike button">
-                </div>
-              </div>
-              <div class="answer-body flex-grow-1 d-flex flex-column ml-3">
-                <p>texttexttext</p>
-                <p>moremoremoremoremoremoremore</p>
-                <div class="bottom-info d-inline-flex align-items-end">
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="checkboxQuestion2" value="option2">
-                    <label class="form-check-label" for="checkboxQuestion2">Correct!</label>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li>
-              <hr>
-            </li>
-            <li>
-              <form>
-                <div class="form-group">
-                  <textarea class="answer-block form-control" id="question-text" rows="4"
-                   placeholder="Enter your answer here..." aria-label="Enter your answer here"></textarea>
-                </div>
-                <button type="submit" class="answer-block btn btn-outline-dark">Answer</button>
-              </form>
-            </li>
-          </ul>
-        </div>
-        <div class="col-2 sidebar">
-          <div class="tags-wrap">
-            <h4>Popular Tags</h4>
-            <div class="tags">
-              <p>Tags tags tags tags tags1 tags2 tagsagsysgg</p>
-            </div>
-          </div>
-          <div class="best-memb-wrap">
-            <h4>Best Members</h4>
-            <div class="best-members">
-              <ul class="list-unstyled">
-                <li><a href=#>Aglicheev Mikhail</a></li>
-                <li><a href=#>Toba</a></li>
-                <li><a href=#>Aleksandrov Anatoliy</a></li>
-              </ul>
-            </div>
-          </div>
+    </div>
+  </li>
+  <li>
+    <hr id="answers-start">
+  </li>
+  <li class="answer-block d-flex rounded pl-2 pt-1 pb-2 mb-3">
+    <div class="avatar-likes">
+      <img src="{% static 'img/Toba.jpg' %}" class="avatar-image" alt="avatar image">
+      <div class="likes-box d-flex flex-column align-items-center mt-2">
+        <img src="{% static 'img/caret-up.svg' %}" alt="like button">
+        <h4 class="likes-amount m-0">51</h4>
+        <img src="{% static 'img/caret-down.svg' %}" alt="dislike button">
+      </div>
+    </div>
+    <div class="answer-body flex-grow-1 d-flex flex-column ml-3">
+      <p>texttexttext</p>
+      <p>moremoremoremoremoremoremore</p>
+      <div class="bottom-info d-inline-flex align-items-end">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="checkboxQuestion1" value="option1">
+          <label class="form-check-label" for="checkboxQuestion1">Correct!</label>
         </div>
       </div>
-    </main>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-      <script>window.jQuery || document.write('<script src="/docs/4.5/assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="/docs/4.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script></body>
-</html>
+    </div>
+  </li>
+  <li class="answer-block d-flex rounded pl-2 pt-1 pb-2 mb-3">
+    <div class="avatar-likes">
+      <img src="{% static 'img/Toba.jpg' %}" class="avatar-image" alt="avatar image">
+      <div class="likes-box d-flex flex-column align-items-center mt-2">
+        <img src="{% static 'img/caret-up.svg' %}" alt="like button">
+        <h4 class="likes-amount m-0">51</h4>
+        <img src="{% static 'img/caret-down.svg' %}" alt="dislike button">
+      </div>
+    </div>
+    <div class="answer-body flex-grow-1 d-flex flex-column ml-3">
+      <p>texttexttext</p>
+      <p>moremoremoremoremoremoremore</p>
+      <div class="bottom-info d-inline-flex align-items-end">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="checkboxQuestion1" value="option1">
+          <label class="form-check-label" for="checkboxQuestion1">Correct!</label>
+        </div>
+      </div>
+    </div>
+  </li>
+  <li>
+    <hr>
+  </li>
+  <li>
+    <form>
+      <div class="form-group">
+        <textarea class="answer-block form-control" id="question-text" rows="4"
+          placeholder="Enter your answer here..." aria-label="Enter your answer here"></textarea>
+      </div>
+      <button type="submit" class="answer-block btn btn-outline-dark">Answer</button>
+    </form>
+  </li>
+</ul>
+{% endblock content %}

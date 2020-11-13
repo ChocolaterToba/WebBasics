@@ -2,7 +2,11 @@
     border: 0.1rem solid black;
 }
 
-#newAvatarImage {
+#fileButton {  
+    cursor: pointer;
+}
+
+.file-image {
     height: 5rem;
     max-width: 7rem;
 }

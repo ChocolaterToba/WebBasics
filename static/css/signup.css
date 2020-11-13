@@ -9,3 +9,8 @@
 #fileButton {  
     cursor: pointer;
 }
+
+.file-image {
+    height: 5rem;
+    max-width: 7rem;
+}

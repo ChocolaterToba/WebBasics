@@ -1,0 +1,19 @@
+{% extends 'inc/navbar.html' %}
+{% load static %}
+
+{% block navbar-user %}
+<li>
+  <a class="nav-link p-0" href="#">
+    <img src="{% static 'img/Toba.jpg' %}" class="avatar-image" alt="avatar image">
+  </a>
+</li>
+<li>
+  <ul class="account-info list-unstyled ml-2">
+    <li class="account-name">AccountName</li>
+    <li>
+      <a id="settings-link" href="/settings/">Settings</a>
+      <a id="logout-link" href="#">LogOut</a>
+    </li>
+  </ul>
+</li>
+{% endblock navbar-user %}
