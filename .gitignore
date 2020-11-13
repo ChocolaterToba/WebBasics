@@ -1,0 +1,7 @@
+node_modules
+venv
+.vscode
+.idea
+*.pyc
+__pycache__
+askme/settings.py
