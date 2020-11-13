@@ -1,6 +1,10 @@
 {% extends 'inc/base_unlogged.html' %}
 {% load static %}
 
+{% block title %}
+<title>Question title will be here</title>
+{% endblock title %}
+
 {% block styles %}
 <link href="{% static 'css/question.css' %}" rel="stylesheet">
 {% endblock styles %}

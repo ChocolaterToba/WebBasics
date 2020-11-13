@@ -1,6 +1,10 @@
 {% extends 'inc/base_unlogged.html' %}
 {% load static %}
 
+{% block title %}
+<title>Sign up</title>
+{% endblock title %}
+
 {% block styles %}
 <link href="{% static 'css/signup.css' %}" rel="stylesheet">
 {% endblock styles %}
@@ -50,14 +54,7 @@
           <input id="avatarFile" type="file" value="upload" onchange="sub(this)" />
         </div>
       </div>
-      <!--div class="form-row mb-3">
-        <label for="avatar" class="custom-file-upload col-form-label col-sm-3 col-md-2 mr-1">Upload avatar</label>
-        <div id="fileButton" class="right-col form-control col-sm-6" onclick="getFile()">Click to upload an avatar</div>
-        <div style='height: 0px;width: 0px; overflow:hidden;'>
-          <input id="avatar" type="file" value="upload" onchange="sub(this)" />
-        </div>
-      </div-->
-      <div class="form-row mb-3">
+      <div class="form-row">
         <div class="col-sm-3 col-md-2 mr-1"></div>
         <button type="submit" class="right-col btn btn-outline-dark">Register!</button>
       </div>

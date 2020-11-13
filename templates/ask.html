@@ -1,6 +1,10 @@
 {% extends 'inc/base_logged.html' %}
 {% load static %}
 
+{% block title %}
+<title>Ask a question</title>
+{% endblock title %}
+
 {% block styles %}
 <link href="{% static 'css/ask.css' %}" rel="stylesheet">
 {% endblock styles %}
@@ -12,15 +16,15 @@
   </li>
   <li>
     <form>
-      <div class="form-row my-1">
+      <div class="form-row mb-2">
         <label for="title" class="col-form-label col-sm-3 col-md-2 mr-1">Title</label>
         <input type="text" class="right-col form-control col-sm-8 col-md-9" id="title" placeholder="Title">
       </div>
-      <div class="form-row my-1">
+      <div class="form-row mb-2">
         <label for="question-text" class="col-form-label col-sm-3 col-md-2 mr-1">Text</label>
         <textarea class="right-col form-control col-sm-8 col-md-9" id="question-text" rows="10" placeholder="Text"></textarea>
       </div>
-      <div class="form-row my-1">
+      <div class="form-row mb-3">
         <label for="question-tags" class="col-form-label col-sm-3 col-md-2 mr-1">Tags</label>
         <input type="text" class="right-col form-control col-sm-8 col-md-9" id="question-tags" placeholder="Tags">
       </div>
