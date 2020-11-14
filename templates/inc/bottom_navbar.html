@@ -1,24 +1,24 @@
 <li>
   <div class="nav-buttons btn-group" role="group" aria-label="Navigation buttons">
     {% if page.has_previous %}
-      <a class="btn btn-secondary" href="{% url 'index' %}?page=1" role="button">1</a>
+      <a class="btn btn-secondary" href="?page=1" role="button">1</a>
       {% if page.previous_page_number == 2 %}
-        <a class="btn btn-secondary" href="{% url 'index' %}?page=2"role="button">2</a>
+        <a class="btn btn-secondary" href="?page=2"role="button">2</a>
       {% elif page.previous_page_number > 2 %}
-        <a class="btn btn-secondary" href="{% url 'index' %}?page={{ page.previous_page_number }}"role="button">&lt</a>
+        <a class="btn btn-secondary" href="?page={{ page.previous_page_number }}"role="button">&lt</a>
       {% endif %}
     {% endif %}
 
-    <a class="btn btn-secondary" href="{% url 'index' %}?page={{ page.number }}" role="button">{{ page.number }}</a>
+    <a class="btn btn-secondary" href="?page={{ page.number }}" role="button">{{ page.number }}</a>
 
     {% if page.has_next %}
       {% if page_end_diff == 2 %}
-        <a class="btn btn-secondary" href="{% url 'index' %}?page={{ page.next_page_number }}"
+        <a class="btn btn-secondary" href="?page={{ page.next_page_number }}"
           role="button">{{ page.next_page_number }}</a>
       {% elif page_end_diff > 2 %}
-        <a class="btn btn-secondary" href="{% url 'index' %}?page={{ page.next_page_number }}" role="button">&gt</a>
+        <a class="btn btn-secondary" href="?page={{ page.next_page_number }}" role="button">&gt</a>
       {% endif %}
-      <a class="btn btn-secondary" href="{% url 'index' %}?page={{ page.paginator.num_pages }}"
+      <a class="btn btn-secondary" href="?page={{ page.paginator.num_pages }}"
         role="button">{{ page.paginator.num_pages }}</a>
     {% endif %}
   </div>
