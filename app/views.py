@@ -26,7 +26,7 @@ for i in range(1, 60):
         'id': i,
         'text': 'text' + str(i),
         'answers_amount': i,
-        'published_date': '11.09.2001',
+        'publishing_date': '11.09.2001',
         'tags': ['Tag1', 'Tag2', 'Tag3'],
         'likes': 51,
     })
