@@ -2,6 +2,11 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.core.paginator import Paginator
 
+def paginate(objects_list, request, per_page=10):
+    paginator = Paginator(objects_list, per_page)
+    page_number = request.GET.get('page')
+    return paginator.get_page(page_number)
+
 logged_in_user = {
     'id': 123,
     'logged_in': True,
@@ -27,13 +32,10 @@ for i in range(1, 60):
     })
 
 def index(request):
-    paginator = Paginator(questions, 5)
-
-    page_number = request.GET.get('page')
-    page = paginator.get_page(page_number)
+    page = paginate(questions, request, 5)
     return render(request, 'index.html', {
         'page': page,
-        'page_end_diff': paginator.num_pages - page.number,
+        'page_end_diff': page.paginator.num_pages - page.number,
         'user': logged_in_user,
     })
 
@@ -74,24 +76,18 @@ def settings(request):
     })
 
 def tag(request, tag):
-    paginator = Paginator(questions, 5)
-
-    page_number = request.GET.get('page')
-    page = paginator.get_page(page_number)
+    page = paginate(questions, request, 5)
     return render(request, 'tag.html', {
         'page': page,
-        'page_end_diff': paginator.num_pages - page.number,
+        'page_end_diff': page.paginator.num_pages - page.number,
         'tag': tag,
         'user': logged_in_user,
     })
 
 def hot(request):
-    paginator = Paginator(questions, 5)
-
-    page_number = request.GET.get('page')
-    page = paginator.get_page(page_number)
+    page = paginate(questions, request, 5)
     return render(request, 'hot_questions.html', {
         'page': page,
-        'page_end_diff': paginator.num_pages - page.number,
+        'page_end_diff': page.paginator.num_pages - page.number,
         'user': logged_in_user,
     })
