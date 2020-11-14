@@ -10,10 +10,10 @@
     </div>
   </div>
   <div class="question-body flex-grow-1 d-flex flex-column ml-3">
-    <a href="/question/{{ question.id }}/"><h3>{{ question.title }}</h3></a>
+    <a href="{% url 'question' question.id %}"><h3>{{ question.title }}</h3></a>
     <p>{{ question.text }}</p>
     <div class="bottom-info mt-auto mb-1 d-inline-flex align-items-end">
-      <a href="/question/#answersStart" class="mr-2">Answers ({{ question.answers_amount }})</a>
+      <a href="{% url 'question' question.id %}#answersStart" class="mr-2">Answers ({{ question.answers_amount }})</a>
       <ul class="list-unstyled">
         <li>Published: {{ question.published_date }}</li>
         <li>
@@ -21,7 +21,7 @@
               <li class="list-inline-item">Tags:</li>
               {% for tag in question.tags %}
               <li class="list-inline-item">
-                  <a href="#">{{ tag }}</a>
+                  <a href="{% url 'tag' tag %}">{{ tag }}</a>
               </li>
               {% endfor %}
           </ul>

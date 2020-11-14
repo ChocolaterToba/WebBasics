@@ -13,11 +13,20 @@
 {% block content %}
 <ul class="list-unstyled mr-5">
   <li class="top-bar mb-3">
-    <h3 class="pr-2">New Questions</h3>
-    <a href="#">Hot Questions</a>
+    <h3 class="mr-2">New Questions</h3>
+    <a href="{% url 'hot' %}">Hot Questions</a>
   </li>
   {% for question in questions %}
     {% include 'inc/one_question.html' %}
   {% endfor %}
+  <li>
+    <div class="nav-buttons btn-group" role="group" aria-label="Navigation buttons">
+      <button type="button" class="btn btn-secondary">1</button>
+      <button type="button" class="btn btn-secondary">2</button>
+      <button type="button" class="btn btn-secondary">3</button>
+      <button type="button" class="btn btn-secondary">...</button>
+      <button type="button" class="btn btn-secondary">69</button>
+    </div>
+  </li>
 </ul>
 {% endblock content %}

@@ -11,7 +11,7 @@
   <ul class="account-info list-unstyled ml-2">
     <li class="account-name">{{ user.username }}</li>
     <li>
-      <a id="settings-link" href="/settings/">Settings</a>
+      <a id="settings-link" href="{% url 'settings' %}">Settings</a>
       <a id="logout-link" href="#">LogOut</a>
     </li>
   </ul>

@@ -14,7 +14,7 @@ unlogged_in_user = {
 }
 
 questions = []
-for i in range(1,4):
+for i in range(1,7):
     questions.append({
         'title': 'title' + str(i),
         'id': i,
@@ -69,6 +69,13 @@ def settings(request):
 
 def tag(request, tag):
     return render(request, 'tag.html', {
-        'questions': questions,
+        'questions': questions[:2],
         'tag': tag,
+        'user': logged_in_user,
+    })
+
+def hot(request):
+    return render(request, 'hot_questions.html', {
+        'questions': questions[1:4],
+        'user': logged_in_user,
     })

@@ -1,0 +1,21 @@
+{% extends user.logged_in|yesno:'inc/base_logged.html,inc/base_unlogged.html' %}
+{% load static %}
+
+{% block title %}
+<title>Hot questions</title>
+{% endblock title %}
+
+{% block styles %}
+<link href="{% static 'css/hot_questions.css' %}" rel="stylesheet">
+{% endblock styles %}
+
+{% block content %}
+<ul class="list-unstyled mr-5">
+  <li class="top-bar mb-3">
+    <h3 class="mr-2">Hot questions</h3>
+  </li>
+  {% for question in questions %}
+    {% include 'inc/one_question.html' %}
+  {% endfor %}
+</ul>
+{% endblock content %}

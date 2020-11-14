@@ -12,7 +12,7 @@
 {% block content %}
 <ul class="list-unstyled mr-5">
   <li class="top-bar mb-3">
-    <h3 class="pr-2">Log In</h3>
+    <h3 class="mr-2">Log In</h3>
   </li>
   <li>
     <p class="warning">Sorry, wrong password!</p>
@@ -35,7 +35,7 @@
   </li>
   <li class="row">
     <div class="col-sm-3 col-md-2 mr-2"></div>
-    <a href="/signup/">Create new account</a>
+    <a href="{% url 'signup' %}">Create new account</a>
   </li>
 </ul>
 {% endblock content %}
