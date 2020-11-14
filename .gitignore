@@ -4,4 +4,4 @@ venv
 .idea
 *.pyc
 __pycache__
-askme/settings.py
+AskAglicheev/settings.py
