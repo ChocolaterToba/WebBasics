@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.core.paginator import Paginator
 
 logged_in_user = {
     'id': 123,
@@ -14,7 +15,7 @@ unlogged_in_user = {
 }
 
 questions = []
-for i in range(1,7):
+for i in range(1, 60):
     questions.append({
         'title': 'title' + str(i),
         'id': i,
@@ -26,8 +27,13 @@ for i in range(1,7):
     })
 
 def index(request):
+    paginator = Paginator(questions, 5)
+
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
     return render(request, 'index.html', {
-        'questions': questions,
+        'page': page,
+        'page_end_diff': paginator.num_pages - page.number,
         'user': logged_in_user,
     })
 
@@ -68,14 +74,24 @@ def settings(request):
     })
 
 def tag(request, tag):
+    paginator = Paginator(questions, 5)
+
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
     return render(request, 'tag.html', {
-        'questions': questions[:2],
+        'page': page,
+        'page_end_diff': paginator.num_pages - page.number,
         'tag': tag,
         'user': logged_in_user,
     })
 
 def hot(request):
+    paginator = Paginator(questions, 5)
+
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
     return render(request, 'hot_questions.html', {
-        'questions': questions[1:4],
+        'page': page,
+        'page_end_diff': paginator.num_pages - page.number,
         'user': logged_in_user,
     })

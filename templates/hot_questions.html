@@ -7,6 +7,7 @@
 
 {% block styles %}
 <link href="{% static 'css/hot_questions.css' %}" rel="stylesheet">
+<link href="{% static 'css/bottom_navbar.css' %}" rel="stylesheet">
 {% endblock styles %}
 
 {% block content %}
@@ -14,8 +15,9 @@
   <li class="top-bar mb-3">
     <h3 class="mr-2">Hot questions</h3>
   </li>
-  {% for question in questions %}
+  {% for question in page %}
     {% include 'inc/one_question.html' %}
   {% endfor %}
+  {% include 'inc/bottom_navbar.html' %}
 </ul>
 {% endblock content %}

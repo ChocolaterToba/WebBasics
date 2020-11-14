@@ -1,0 +1,7 @@
+.nav-buttons > .btn {
+    margin-right: 1rem;
+    border-radius: 0.25rem !important;
+    background-color: white;
+    color: black;
+    border-color: black;
+}

@@ -8,6 +8,7 @@
 
 {% block styles %}
 <link href="{% static 'css/index.css' %}" rel="stylesheet">
+<link href="{% static 'css/bottom_navbar.css' %}" rel="stylesheet">
 {% endblock styles %}
 
 {% block content %}
@@ -16,17 +17,9 @@
     <h3 class="mr-2">New Questions</h3>
     <a href="{% url 'hot' %}">Hot Questions</a>
   </li>
-  {% for question in questions %}
+  {% for question in page %}
     {% include 'inc/one_question.html' %}
   {% endfor %}
-  <li>
-    <div class="nav-buttons btn-group" role="group" aria-label="Navigation buttons">
-      <button type="button" class="btn btn-secondary">1</button>
-      <button type="button" class="btn btn-secondary">2</button>
-      <button type="button" class="btn btn-secondary">3</button>
-      <button type="button" class="btn btn-secondary">...</button>
-      <button type="button" class="btn btn-secondary">69</button>
-    </div>
-  </li>
+  {% include 'inc/bottom_navbar.html' %}
 </ul>
 {% endblock content %}
