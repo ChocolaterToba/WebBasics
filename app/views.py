@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.core.paginator import Paginator
+from app.models import Question
 
 def paginate(objects_list, request, per_page=10):
     paginator = Paginator(objects_list, per_page)
@@ -32,7 +33,7 @@ for i in range(1, 60):
     })
 
 def index(request):
-    page = paginate(questions, request, 5)
+    page = paginate(Question.objects.all(), request, 5)
     return render(request, 'index.html', {
         'page': page,
         'page_end_diff': page.paginator.num_pages - page.number,
@@ -49,11 +50,16 @@ for i in range(1,4):
     })
 
 def question(request, id):
-    return render(request, 'question.html', {
-        'question': questions[id - 1],
-        'answers': answers,
-        'user': logged_in_user,
-    })
+    try:
+        return render(request, 'question.html', {
+            'question': Question.objects.get(id=id),
+            'answers': answers,
+            'user': logged_in_user,
+        })
+    except:
+        return render(request, '404.html', {
+            'user': logged_in_user,
+        })
 
 def ask(request):
     return render(request, 'ask.html', {
@@ -76,7 +82,7 @@ def settings(request):
     })
 
 def tag(request, tag):
-    page = paginate(questions, request, 5)
+    page = paginate(Question.objects.SearchByTag(tag).all(),  request, 5)
     return render(request, 'tag.html', {
         'page': page,
         'page_end_diff': page.paginator.num_pages - page.number,

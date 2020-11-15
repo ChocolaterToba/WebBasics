@@ -9,7 +9,6 @@ class Profile(models.Model):
                                height_field=None, width_field=None,
                                max_length=256, verbose_name='Avatar')
     nickname = models.CharField(max_length = 32, verbose_name='Nickname')
-    email = models.EmailField(max_length = 256, verbose_name='E-mail')
 
     def __str__(self):
         return self.nickname
@@ -17,12 +16,28 @@ class Profile(models.Model):
     class Meta:
         verbose_name = 'Profile'
         verbose_name_plural = 'Profiles'
+        ordering = ['id']
+
+class QuestionManager(models.Manager):
+    def SearchByTag(self, tag):
+        return self.filter(tags__name=tag)
+
 
 class Question(models.Model):
-    author = models.ForeignKey('Profile', on_delete=models.CASCADE)
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE,)
     title = models.CharField(max_length=256, verbose_name='Title')
     text = models.TextField(verbose_name='Main text')
     publishing_date = models.DateField(auto_now_add=True, verbose_name='Publishing date')
+    rating = models.IntegerField(verbose_name='Amount of likes')
+    tags = models.ManyToManyField('Tag', verbose_name='Tags', blank=True,
+                                  related_name="questions", related_query_name="question",)
+    likes = models.ManyToManyField('Profile', through='QuestionLike',
+                                   verbose_name="Likes", blank=True,
+                                   related_name="liked_questions",
+                                   related_query_name="liked_question",)
+    objects = QuestionManager()
+
+    
 
     def __str__(self):
         return self.title
@@ -30,6 +45,7 @@ class Question(models.Model):
     class Meta:
         verbose_name = 'Question'
         verbose_name_plural = 'Questions'
+        ordering = ['id']
 
 class Answer(models.Model):
     author = models.ForeignKey('Profile', on_delete=models.CASCADE)
@@ -37,7 +53,11 @@ class Answer(models.Model):
 
     text = models.TextField(verbose_name='Main text')
     is_correct = models.BooleanField(verbose_name='Is answer correct?')
-    likes_amount = models.IntegerField(verbose_name='Amount of likes')
+    rating = models.IntegerField(verbose_name='Amount of likes')
+    likes = models.ManyToManyField('Profile', through='AnswerLike',
+                                   verbose_name="Likes", blank=True,
+                                   related_name="liked_answers",
+                                   related_query_name="liked_answer",)
 
     def __str__(self):
         return self.text
@@ -45,10 +65,10 @@ class Answer(models.Model):
     class Meta:
         verbose_name = 'Answer'
         verbose_name_plural = 'Answers'
+        ordering = ['id']
 
 class Tag(models.Model):
-    name = models.CharField(max_length=32, verbose_name='Name')
-    related_questions = models.ManyToManyField('Question', verbose_name='Related questions')
+    name = models.CharField(max_length=32, verbose_name='Name', primary_key=True)
 
     def __str__(self):
         return self.name
@@ -56,10 +76,11 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'Tag'
         verbose_name_plural = 'Tags'
+        ordering = ['name']
 
 class QuestionLike(models.Model):
-    user = models.OneToOneField('Profile', on_delete=models.CASCADE)
-    question = models.OneToOneField('Question', on_delete=models.CASCADE)
+    user = models.ForeignKey('Profile', on_delete=models.CASCADE)
+    question = models.ForeignKey('Question', on_delete=models.CASCADE)
     is_a_like = models.BooleanField(verbose_name='Is that a like?')
 
     def __str__(self):
@@ -68,10 +89,11 @@ class QuestionLike(models.Model):
     class Meta:
         verbose_name = 'Like on question'
         verbose_name_plural = 'Likes on questions'
+        ordering = ['id']
 
 class AnswerLike(models.Model):
-    user = models.OneToOneField('Profile', on_delete=models.CASCADE)
-    answer = models.OneToOneField('Answer', on_delete=models.CASCADE)
+    user = models.ForeignKey('Profile', on_delete=models.CASCADE)
+    answer = models.ForeignKey('Answer', on_delete=models.CASCADE)
     is_a_like = models.BooleanField(verbose_name='Is that a like?')
 
     def __str__(self):
@@ -80,3 +102,4 @@ class AnswerLike(models.Model):
     class Meta:
         verbose_name = 'Like on answer'
         verbose_name_plural = 'Likes on answers'
+        ordering = ['id']

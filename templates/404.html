@@ -1,0 +1,11 @@
+{% extends user.logged_in|yesno:'inc/base_logged.html,inc/base_unlogged.html' %}
+{% load static %}
+
+{% block title %}
+<title>Page not found</title>
+{% endblock title %}
+
+{% block content %}
+<p>Requested page was not found!</p>
+<a href="{% url 'index' %}">Back to main page</a>
+{% endblock content %}
