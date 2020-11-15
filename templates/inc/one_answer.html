@@ -1,13 +1,17 @@
 {% load static %}
 
 <li class="answer-block d-flex rounded pl-2 pt-1 pb-2 mb-3">
-  {% include 'inc/avatar_likes.html' %}
+  {% include 'inc/answer_likesbox.html' %}
   <div class="answer-body flex-grow-1 d-flex flex-column ml-3">
     <p>{{ answer.text }}</p>
     <div class="bottom-info mt-auto mb-1 d-inline-flex align-items-end">
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="checkboxQuestion1" value="option1">
-        <label class="form-check-label" for="checkboxQuestion1">Correct!</label>
+        {% if answer.is_correct %}
+          <input class="form-check-input" type="checkbox" id="checkboxAnswer{{ answer.id }}" value="option{{ answer.id }}" checked>
+        {% else %}
+          <input class="form-check-input" type="checkbox" id="checkboxAnswer{{ answer.id }}" value="option{{ answer.id }}">
+        {% endif %}
+        <label class="form-check-label" for="checkboxAnswer{{ answer.id }}">Correct!</label>
       </div>
     </div>
   </div>

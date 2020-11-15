@@ -12,6 +12,24 @@ class Profile(models.Model):
                                max_length=256, verbose_name='Avatar')
     nickname = models.CharField(max_length = 32, verbose_name='Nickname')
 
+    def LikedOrDisliked(self, post):
+        if isinstance(post, Question):
+            result_query = self.liked_questions.filter(id=post.id)
+        elif isinstance(post, Answer):
+            result_query = self.liked_answers.filter(id=post.id)
+        else:
+            return 'NoVote'
+
+        if result_query.exists():
+            if isinstance(result_query[0], Question):
+                if (result_query.filter(questionlike__is_a_like=True).exists()):
+                    return 'Liked'
+            elif (result_query.filter(answerlike__is_a_like=True).exists()):
+                return 'Liked'
+            return 'Disliked'
+
+        return 'NoVote'   
+
     def __str__(self):
         return self.nickname
     

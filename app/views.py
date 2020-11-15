@@ -1,7 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.core.paginator import Paginator
-from app.models import Question, Profile
+from django.forms.models import model_to_dict
+from django.db.models.query import QuerySet
+from app.models import Profile, Question, Answer
 
 def paginate(objects_list, request, per_page=10):
     paginator = Paginator(objects_list, per_page)
@@ -21,6 +23,19 @@ logged_in_user.update({'logged_in': True})
 unlogged_in_user = base_user_dict.copy()
 unlogged_in_user.update({'logged_in': False})
 
+def CheckIfLiked(user, posts):
+    if isinstance(posts, (Question, Answer)):
+        result = model_to_dict(posts)
+        result['liked_or_disliked'] =  user.LikedOrDisliked(posts)
+        return result
+    elif isinstance(posts, QuerySet):
+        if not posts.exists():
+            return []
+        if isinstance(posts[0], (Question, Answer)):
+            print(CheckIfLiked(user, posts[0]))
+            return [CheckIfLiked(user, post) for post in posts]
+    raise TypeError('Argument posts must be either Question, Answer or QuerySet of them')
+
 def index(request):
     page = paginate(Question.objects.New().all().prefetch_related('author', 'answers', 'tags', 'likes'), request, 5)
     return render(request, 'index.html', {
@@ -33,8 +48,8 @@ def question(request, id):
     try:
         question = Question.objects.get(id=id)
         return render(request, 'question.html', {
-            'question': question,
-            'answers': question.answers.Best().all(),
+            'question': CheckIfLiked(base_user, question),
+            'answers': CheckIfLiked(base_user, question.answers.Best().all()),
             'user': logged_in_user,
         })
     except:
