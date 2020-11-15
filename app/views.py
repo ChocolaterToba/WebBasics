@@ -1,24 +1,25 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.core.paginator import Paginator
-from app.models import Question
+from app.models import Question, Profile
 
 def paginate(objects_list, request, per_page=10):
     paginator = Paginator(objects_list, per_page)
     page_number = request.GET.get('page')
     return paginator.get_page(page_number)
 
-logged_in_user = {
-    'id': 123,
-    'logged_in': True,
-    'username': 'StandardUsername',
-    'login': 'StandardLogin',
-    'e_mail': 'Email@mail.ru',
+base_user = Profile.objects.get(id=1)
+base_user_dict = {
+    'user': base_user.user,
+    'avatar': base_user.avatar,
+    'nickname': base_user.nickname,
 }
 
-unlogged_in_user = {
-    'logged_in': False,
-}
+logged_in_user = base_user_dict.copy()
+logged_in_user.update({'logged_in': True})
+
+unlogged_in_user = base_user_dict.copy()
+unlogged_in_user.update({'logged_in': False})
 
 def index(request):
     page = paginate(Question.objects.New().all().prefetch_related('author', 'answers', 'tags', 'likes'), request, 5)
@@ -28,21 +29,12 @@ def index(request):
         'user': logged_in_user,
     })
 
-answers = []
-for i in range(1,4):
-    answers.append({
-        'id': i,
-        'text': 'text' + str(i),
-        'is_correct': False,
-        'likes': 51,
-    })
-
 def question(request, id):
     try:
         question = Question.objects.get(id=id)
         return render(request, 'question.html', {
             'question': question,
-            'answers': question.answers.all(),
+            'answers': question.answers.Best().all(),
             'user': logged_in_user,
         })
     except:

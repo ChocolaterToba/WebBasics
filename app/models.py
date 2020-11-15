@@ -30,6 +30,9 @@ class QuestionManager(models.Manager):
     def Hot(self):
         # Hot questions are today's questions with best ratings.
         return self.filter(publishing_date=datetime.today()).order_by('-rating')
+    
+    def Best(self):
+        return self.order_by('-rating')
 
 
 class Question(models.Model):
@@ -60,6 +63,10 @@ class Question(models.Model):
         verbose_name_plural = 'Questions'
         ordering = ['id']
 
+class AnswerManager(models.Manager):
+    def Best(self):
+        return self.order_by('-rating')
+
 class Answer(models.Model):
     author = models.ForeignKey('Profile', on_delete=models.CASCADE)
     related_question = models.ForeignKey('Question', on_delete=models.CASCADE,
@@ -73,6 +80,7 @@ class Answer(models.Model):
                                    verbose_name="Likes", blank=True,
                                    related_name="liked_answers",
                                    related_query_name="liked_answer",)
+    objects = AnswerManager()
 
     def RefreshRating(self):
         self.rating = self.likes.objects.GetRating()
