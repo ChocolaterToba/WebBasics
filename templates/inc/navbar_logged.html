@@ -12,7 +12,7 @@
     <li class="account-name">{{ user.username }}</li>
     <li>
       <a id="settings-link" href="{% url 'settings' %}">Settings</a>
-      <a id="logout-link" href="#">LogOut</a>
+      <a id="logout-link" href="{% url 'login' %}">LogOut</a>
     </li>
   </ul>
 </li>

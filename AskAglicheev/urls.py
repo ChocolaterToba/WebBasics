@@ -18,6 +18,9 @@ from django.urls import path
 
 from app import views
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
     path('', views.index, name='index'),
@@ -29,4 +32,4 @@ urlpatterns = [
     path('settings/', views.settings, name='settings'),
     path('tag/<str:tag>/', views.tag, name='tag'),
     path('hot/', views.hot, name='hot'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -20,20 +20,8 @@ unlogged_in_user = {
     'logged_in': False,
 }
 
-questions = []
-for i in range(1, 60):
-    questions.append({
-        'title': 'title' + str(i),
-        'id': i,
-        'text': 'text' + str(i),
-        'answers_amount': i,
-        'publishing_date': '11.09.2001',
-        'tags': ['Tag1', 'Tag2', 'Tag3'],
-        'likes': 51,
-    })
-
 def index(request):
-    page = paginate(Question.objects.all(), request, 5)
+    page = paginate(Question.objects.New().all().prefetch_related('author', 'answers', 'tags', 'likes'), request, 5)
     return render(request, 'index.html', {
         'page': page,
         'page_end_diff': page.paginator.num_pages - page.number,
@@ -51,9 +39,10 @@ for i in range(1,4):
 
 def question(request, id):
     try:
+        question = Question.objects.get(id=id)
         return render(request, 'question.html', {
-            'question': Question.objects.get(id=id),
-            'answers': answers,
+            'question': question,
+            'answers': question.answers.all(),
             'user': logged_in_user,
         })
     except:
@@ -91,7 +80,7 @@ def tag(request, tag):
     })
 
 def hot(request):
-    page = paginate(questions, request, 5)
+    page = paginate(Question.objects.Hot().all(), request, 5)
     return render(request, 'hot_questions.html', {
         'page': page,
         'page_end_diff': page.paginator.num_pages - page.number,

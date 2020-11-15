@@ -1,11 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from datetime import datetime
+
 class Profile(models.Model):
     user = models.OneToOneField(User,
                                 on_delete=models.CASCADE)
 
-    avatar = models.ImageField(upload_to='uploads/avatars/',
+    avatar = models.ImageField(upload_to='avatars/',
                                height_field=None, width_field=None,
                                max_length=256, verbose_name='Avatar')
     nickname = models.CharField(max_length = 32, verbose_name='Nickname')
@@ -21,10 +23,17 @@ class Profile(models.Model):
 class QuestionManager(models.Manager):
     def SearchByTag(self, tag):
         return self.filter(tags__name=tag)
+    
+    def New(self):
+        return self.order_by('-publishing_date')
+    
+    def Hot(self):
+        # Hot questions are today's questions with best ratings.
+        return self.filter(publishing_date=datetime.today()).order_by('-rating')
 
 
 class Question(models.Model):
-    author = models.ForeignKey(Profile, on_delete=models.CASCADE,)
+    author = models.ForeignKey('Profile', on_delete=models.CASCADE,)
     title = models.CharField(max_length=256, verbose_name='Title')
     text = models.TextField(verbose_name='Main text')
     publishing_date = models.DateField(auto_now_add=True, verbose_name='Publishing date')
@@ -37,7 +46,11 @@ class Question(models.Model):
                                    related_query_name="liked_question",)
     objects = QuestionManager()
 
+    def RefreshRating(self):
+        self.rating = self.likes.objects.GetRating()
     
+    def AnswersAmount(self):
+        return self.answers.count()
 
     def __str__(self):
         return self.title
@@ -49,7 +62,9 @@ class Question(models.Model):
 
 class Answer(models.Model):
     author = models.ForeignKey('Profile', on_delete=models.CASCADE)
-    related_question = models.ForeignKey('Question', on_delete=models.CASCADE)
+    related_question = models.ForeignKey('Question', on_delete=models.CASCADE,
+                                         related_name="answers",
+                                         related_query_name="answer",)
 
     text = models.TextField(verbose_name='Main text')
     is_correct = models.BooleanField(verbose_name='Is answer correct?')
@@ -58,6 +73,11 @@ class Answer(models.Model):
                                    verbose_name="Likes", blank=True,
                                    related_name="liked_answers",
                                    related_query_name="liked_answer",)
+
+    def RefreshRating(self):
+        self.rating = self.likes.objects.GetRating()
+    
+
 
     def __str__(self):
         return self.text
@@ -78,10 +98,15 @@ class Tag(models.Model):
         verbose_name_plural = 'Tags'
         ordering = ['name']
 
+class LikeManager(models.Manager):
+    def GetRating(self):
+        return self.objects.count() - self.filter(is_a_like=True).count()
+
 class QuestionLike(models.Model):
     user = models.ForeignKey('Profile', on_delete=models.CASCADE)
     question = models.ForeignKey('Question', on_delete=models.CASCADE)
     is_a_like = models.BooleanField(verbose_name='Is that a like?')
+    objects = LikeManager()
 
     def __str__(self):
         return 'Question Like'
@@ -95,6 +120,7 @@ class AnswerLike(models.Model):
     user = models.ForeignKey('Profile', on_delete=models.CASCADE)
     answer = models.ForeignKey('Answer', on_delete=models.CASCADE)
     is_a_like = models.BooleanField(verbose_name='Is that a like?')
+    objects = LikeManager()
 
     def __str__(self):
         return 'Answer Like'

@@ -1,0 +1,10 @@
+{% load static %}
+
+<div class="avatar-likes">
+  <img src="{{ question.author.avatar.url }}", class="avatar-image", alt="avatar image">
+  <div class="likes-box d-flex flex-column align-items-center mt-2">
+    <img src="{% static 'img/caret-up.svg' %}" alt="like button">
+    <h4 class="likes-amount m-0">{{ question.rating }}</h4>
+    <img src="{% static 'img/caret-down.svg' %}" alt="dislike button">
+  </div>
+</div>
