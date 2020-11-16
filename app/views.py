@@ -20,18 +20,6 @@ unlogged_in_user = {
     'logged_in': False,
 }
 
-questions = []
-for i in range(1, 60):
-    questions.append({
-        'title': 'title' + str(i),
-        'id': i,
-        'text': 'text' + str(i),
-        'answers_amount': i,
-        'publishing_date': '11.09.2001',
-        'tags': ['Tag1', 'Tag2', 'Tag3'],
-        'likes': 51,
-    })
-
 def index(request):
     page = paginate(Question.objects.all(), request, 5)
     return render(request, 'index.html', {
