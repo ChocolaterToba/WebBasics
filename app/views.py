@@ -4,18 +4,13 @@ from django.core.paginator import Paginator
 from django.forms.models import model_to_dict
 from django.db.models.query import QuerySet
 from app.models import Profile, Question, Answer
-from django.contrib.auth.models import User
 
 def paginate(objects_list, request, per_page=10):
     paginator = Paginator(objects_list, per_page)
     page_number = request.GET.get('page')
     return paginator.get_page(page_number)
 
-# base_user_user = User.objects.create_user(
-#                 'firstname',
-#                 'email@mail.ru',
-#                 'thisismyhair')
-base_user = Profile.objects.first()
+base_user = Profile.objects.get(id=1)
 base_user_dict = {
     'user': base_user.user,
     'avatar': base_user.avatar,
