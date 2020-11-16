@@ -1,4 +1,5 @@
-{% extends user.logged_in|yesno:'inc/base_logged.html,inc/base_unlogged.html' %}
+{% extends 'inc/base.html' %}
+
 {% load static %}
 
 {% block title %}
@@ -15,12 +16,14 @@
   <li>
     <hr id="answersStart">
   </li>
-  {% for answer in answers %}
-    {% include 'inc/one_answer.html' %}
-  {% endfor %}
-  <li>
-    <hr>
-  </li>
+  {% if answers %}
+    {% for answer in answers %}
+      {% include 'inc/one_answer.html' %}
+    {% endfor %}
+    <li>
+      <hr>
+    </li>
+  {% endif %}
   <li>
     <form>
       <div class="form-group">
