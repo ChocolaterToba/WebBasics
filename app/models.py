@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from datetime import datetime
+from datetime import datetime, date
 
 class Profile(models.Model):
     user = models.OneToOneField(User,
@@ -57,7 +57,7 @@ class Question(models.Model):
     author = models.ForeignKey('Profile', on_delete=models.CASCADE)
     title = models.CharField(max_length=256, verbose_name='Title')
     text = models.TextField(verbose_name='Main text')
-    publishing_date = models.DateField(auto_now_add=True, verbose_name='Publishing date')
+    publishing_date = models.DateField(default=date.today, verbose_name='Publishing date')
     rating = models.IntegerField(verbose_name='Amount of likes', default=0)
     tags = models.ManyToManyField('Tag', verbose_name='Tags', blank=True,
                                   related_name="questions", related_query_name="question")
@@ -124,7 +124,7 @@ class Tag(models.Model):
 
 class LikeManager(models.Manager):
     def GetRating(self):
-        return self.objects.count() - self.filter(is_a_like=True).count()
+        return self.objects.count() - 2 * self.filter(is_a_like=False).count()
 
 class QuestionLike(models.Model):
     user = models.ForeignKey('Profile', on_delete=models.CASCADE)
