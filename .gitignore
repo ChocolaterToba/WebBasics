@@ -4,5 +4,4 @@ venv
 .idea
 *.pyc
 __pycache__
-AskAglicheev/settings.py
 db.sqlite3
