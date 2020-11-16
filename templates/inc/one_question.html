@@ -6,7 +6,7 @@
     <a href="{% url 'question' question.id %}"><h3>{{ question.title }}</h3></a>
     <p>{{ question.text }}</p>
     <div class="bottom-info mt-auto mb-1 d-inline-flex align-items-end">
-      <a href="{% url 'question' question.id %}#answersStart" class="mr-2">Answers ({{ question.AnswersAmount }})</a>
+      <a href="{% url 'question' question.id %}#answersStart" class="mr-2">Answers ({{ question.answers_amount }})</a>
       <ul class="list-unstyled">
         <li>Published: {{ question.publishing_date }}</li>
         <li>

@@ -54,17 +54,17 @@ class QuestionManager(models.Manager):
 
 
 class Question(models.Model):
-    author = models.ForeignKey('Profile', on_delete=models.CASCADE,)
+    author = models.ForeignKey('Profile', on_delete=models.CASCADE)
     title = models.CharField(max_length=256, verbose_name='Title')
     text = models.TextField(verbose_name='Main text')
     publishing_date = models.DateField(auto_now_add=True, verbose_name='Publishing date')
-    rating = models.IntegerField(verbose_name='Amount of likes')
+    rating = models.IntegerField(verbose_name='Amount of likes', default=0)
     tags = models.ManyToManyField('Tag', verbose_name='Tags', blank=True,
-                                  related_name="questions", related_query_name="question",)
+                                  related_name="questions", related_query_name="question")
     likes = models.ManyToManyField('Profile', through='QuestionLike',
                                    verbose_name="Likes", blank=True,
                                    related_name="liked_questions",
-                                   related_query_name="liked_question",)
+                                   related_query_name="liked_question")
     objects = QuestionManager()
 
     def RefreshRating(self):
@@ -89,21 +89,19 @@ class Answer(models.Model):
     author = models.ForeignKey('Profile', on_delete=models.CASCADE)
     related_question = models.ForeignKey('Question', on_delete=models.CASCADE,
                                          related_name="answers",
-                                         related_query_name="answer",)
+                                         related_query_name="answer")
 
     text = models.TextField(verbose_name='Main text')
     is_correct = models.BooleanField(verbose_name='Is answer correct?')
-    rating = models.IntegerField(verbose_name='Amount of likes')
+    rating = models.IntegerField(verbose_name='Amount of likes', default=0)
     likes = models.ManyToManyField('Profile', through='AnswerLike',
                                    verbose_name="Likes", blank=True,
                                    related_name="liked_answers",
-                                   related_query_name="liked_answer",)
+                                   related_query_name="liked_answer")
     objects = AnswerManager()
 
     def RefreshRating(self):
         self.rating = self.likes.objects.GetRating()
-    
-
 
     def __str__(self):
         return self.text
