@@ -135,11 +135,11 @@ class QuestionLike(models.Model):
     objects = QuestionLikeManager()
 
     def __str__(self):
-        return 'Question Like'
+        return ('Like' if self.is_a_like else 'Dislike') + ' on question: ' + self.question.title
 
     class Meta:
-        verbose_name = 'Like on question'
-        verbose_name_plural = 'Likes on questions'
+        verbose_name = 'Like/Dislike on question'
+        verbose_name_plural = 'Likes/dislikes on questions'
         ordering = ['id']
 
 class AnswerLikeManager(models.Manager):
@@ -154,9 +154,9 @@ class AnswerLike(models.Model):
     objects = AnswerLikeManager()
 
     def __str__(self):
-        return 'Answer Like'
+        return ('Like' if self.is_a_like else 'Dislike') + ' on answer: ' + self.answer.text[:10] + '...'
 
     class Meta:
-        verbose_name = 'Like on answer'
-        verbose_name_plural = 'Likes on answers'
+        verbose_name = 'Like/Dislike on answer'
+        verbose_name_plural = 'Likes/dislikes on answer'
         ordering = ['id']

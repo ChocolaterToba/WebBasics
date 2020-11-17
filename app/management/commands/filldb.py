@@ -31,8 +31,8 @@ class Command(BaseCommand):
 
         if users_cnt:
             self.fill_profiles(users_cnt)
-            if questions_cnt:
-               self.fill_questions(questions_cnt)
+        if questions_cnt:
+            self.fill_questions(questions_cnt)
 
     def fill_users(self, cnt):
         for i in range(cnt):
@@ -72,13 +72,21 @@ class Command(BaseCommand):
             )
         )
         for i in range(cnt):
-            Question.objects.create(
+            question = Question.objects.create(
                 author_id=choice(profile_ids),
                 title=f.sentence(nb_words=5)[:256],
                 text='. '.join(f.sentences(f.random_int(min=2, max=7))),
                 publishing_date=f.date_between('-40y', 'today'),
             )
-            Question.objects.last().tags.set(choices(tag_names, k=f.random_int(min=0, max=min(5, Tag.objects.count()))))
-            Question.objects.last().likes.set(choices(profile_ids, k=f.random_int(min=0, max=len(profile_ids))),
-                                              through_defaults={'is_a_like': True})
-            Question.objects.last().RefreshRating()
+
+            # Setting tags.
+            question.tags.set(choices(tag_names, k=f.random_int(min=0, max=min(5, Tag.objects.count()))))
+            
+            # Setting likes.
+            question.likes.set(choices(profile_ids, k=f.random_int(min=0, max=len(profile_ids))),
+                               through_defaults={'is_a_like': True})
+            
+            # Setting dislikes.
+            question.likes.set(choices(profile_ids, k=f.random_int(min=0, max=len(profile_ids))),
+                               through_defaults={'is_a_like': False})
+            question.RefreshRating()
