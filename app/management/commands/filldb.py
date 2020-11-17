@@ -40,9 +40,9 @@ class Command(BaseCommand):
         
         if db_size:
             if db_size == 'small':
-                users_cnt = 5
+                users_cnt = 20
                 questions_cnt = 30
-                tags_cnt = 5
+                tags_cnt = 10
             elif db_size == 'medium':
                 users_cnt = 100
                 questions_cnt = 5000
@@ -114,14 +114,14 @@ class Command(BaseCommand):
             # Setting likes.
             question.likes.set(choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
                                                                                   QUESTION_LIKES_DENOMINATOR))),
-                               through_defaults={'is_a_like': True})
+                               through_defaults={'is_a_like': 1})
             
             # Setting dislikes (set() will override some of the likes).
             question.likes.add(*choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
                                                                                    QUESTION_LIKES_DENOMINATOR))),
-                               through_defaults={'is_a_like': False})
+                               through_defaults={'is_a_like': -1})
 
-            question.rating = QuestionLike.objects.GetRating(question.id)
+            question.rating = sum(question.questionlikes.values_list('is_a_like', flat=True))
             question.save()
             self.fill_answers(question, f.random_int(min=0, max=ANSWER_MAX_AMOUNT))
     
@@ -145,13 +145,13 @@ class Command(BaseCommand):
             # Setting likes.
             answer.likes.set(choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
                                                                                 ANSWER_LIKES_DENOMINATOR))),
-                             through_defaults={'is_a_like': True})
+                             through_defaults={'is_a_like': 1})
             
             # Setting dislikes (set() will override some of the likes).
             answer.likes.add(*choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
                                                                                  ANSWER_LIKES_DENOMINATOR))),
-                             through_defaults={'is_a_like': False})
-            answer.rating = QuestionLike.objects.GetRating(answer.id)
+                             through_defaults={'is_a_like': -1})
+            answer.rating = sum(answer.answerlikes.values_list('is_a_like', flat=True))
             answer.save()
     
     def fill_tags(self, cnt):

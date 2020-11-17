@@ -12,24 +12,6 @@ class Profile(models.Model):
                                max_length=256, verbose_name='Avatar')
     nickname = models.CharField(max_length = 32, verbose_name='Nickname')
 
-    def LikedOrDisliked(self, post):
-        if isinstance(post, Question):
-            result_query = self.liked_questions.filter(id=post.id)
-        elif isinstance(post, Answer):
-            result_query = self.liked_answers.filter(id=post.id)
-        else:
-            return 'NoVote'
-
-        if result_query.exists():
-            if isinstance(result_query[0], Question):
-                if (result_query.filter(questionlikes__is_a_like=True).exists()):
-                    return 'Liked'
-            elif (result_query.filter(answerlikes__is_a_like=True).exists()):
-                return 'Liked'
-            return 'Disliked'
-
-        return 'NoVote'   
-
     def __str__(self):
         return self.nickname
     
@@ -63,14 +45,22 @@ class Question(models.Model):
     rating = models.IntegerField(verbose_name='Amount of likes', default=0)
     tags = models.ManyToManyField('Tag', verbose_name='Tags', blank=True,
                                   related_name="questions", related_query_name="question")
-    likes = models.ManyToManyField('Profile', through='QuestionLike',
-                                   verbose_name="Likes", blank=True,
+    likes = models.ManyToManyField('Profile', through='QuestionLike', blank=True,
                                    related_name="liked_questions",
-                                   related_query_name="liked_question")
+                                   related_query_name="liked_question",
+                                   verbose_name="Likes")
     objects = QuestionManager()
 
     def __str__(self):
         return self.title
+    
+    def LikedOrDislikedBy(self, user):
+        try:
+            if self.questionlikes.get(user_id=user.id).is_a_like == 1:
+                return 'Liked'
+            return 'Disliked'
+        except QuestionLike.DoesNotExist:
+            return 'NoVote'
 
     class Meta:
         verbose_name = 'Question'
@@ -88,16 +78,26 @@ class Answer(models.Model):
                                          related_query_name="answer")
 
     text = models.TextField(verbose_name='Main text')
-    is_correct = models.BooleanField(verbose_name='Is answer correct?', default=False)
-    rating = models.IntegerField(verbose_name='Amount of likes', default=0)
-    likes = models.ManyToManyField('Profile', through='AnswerLike',
-                                   verbose_name="Likes", blank=True,
+    is_correct = models.BooleanField(default=False, verbose_name='Is answer correct?')
+    rating = models.IntegerField(default=0, verbose_name='Amount of likes')
+    likes = models.ManyToManyField('Profile', through='AnswerLike', blank=True,
                                    related_name="liked_answers",
-                                   related_query_name="liked_answer")
+                                   related_query_name="liked_answer",
+                                   verbose_name="Likes")
     objects = AnswerManager()
 
     def __str__(self):
-        return self.text[:30] + '...'
+        if len(self.text) > 33:
+            return self.text[:30] + '...'
+        return self.text
+    
+    def LikedOrDislikedBy(self, user):
+        try:
+            if self.answerlikes.get(user_id=user.id).is_a_like == 1:
+                return 'Liked'
+            return 'Disliked'
+        except AnswerLike.DoesNotExist:
+            return 'NoVote'
 
     class Meta:
         verbose_name = 'Answer'
@@ -105,7 +105,7 @@ class Answer(models.Model):
         ordering = ['id']
 
 class Tag(models.Model):
-    name = models.CharField(max_length=32, verbose_name='Name', primary_key=True)
+    name = models.CharField(max_length=32, primary_key=True, verbose_name='Name')
 
     def __str__(self):
         return self.name
@@ -115,17 +115,17 @@ class Tag(models.Model):
         verbose_name_plural = 'Tags'
         ordering = ['name']
 
-class QuestionLikeManager(models.Manager):
-    def GetRating(self, question_id):
-        related_likes = self.filter(question_id=question_id)
-        return related_likes.filter(is_a_like=True).count() - related_likes.filter(is_a_like=False).count()
-
 class QuestionLike(models.Model):
-    user = models.ForeignKey('Profile', on_delete=models.CASCADE)
+    user = models.ForeignKey('Profile', on_delete=models.CASCADE, verbose_name='User that liked')
     question = models.ForeignKey('Question', on_delete=models.CASCADE,
-                                 related_name="questionlikes")
-    is_a_like = models.BooleanField(verbose_name='Is that a like?')
-    objects = QuestionLikeManager()
+                                 related_name="questionlikes",
+                                 verbose_name='Liked question')
+    is_a_like = models.IntegerField(default=-1,
+                                    choices=(
+                                        (-1, 'Dislike'),
+                                        (1,  'Like')
+                                    ),
+                                    verbose_name='Is that a like?')
 
     def __str__(self):
         return (('Like' if self.is_a_like else 'Dislike') +
@@ -137,16 +137,17 @@ class QuestionLike(models.Model):
         verbose_name_plural = 'Likes/dislikes on questions'
         ordering = ['id']
 
-class AnswerLikeManager(models.Manager):
-    def GetRating(self, answer_id):
-        related_likes = self.filter(answer_id=answer_id)
-        return related_likes.filter(is_a_like=True).count() - related_likes.filter(is_a_like=False).count()
-
 class AnswerLike(models.Model):
-    user = models.ForeignKey('Profile', on_delete=models.CASCADE)
-    answer = models.ForeignKey('Answer', on_delete=models.CASCADE)
-    is_a_like = models.BooleanField(verbose_name='Is that a like?')
-    objects = AnswerLikeManager()
+    user = models.ForeignKey('Profile', on_delete=models.CASCADE, verbose_name='User that liked')
+    answer = models.ForeignKey('Answer', on_delete=models.CASCADE,
+                                 related_name="answerlikes",
+                                 verbose_name='Liked answer')
+    is_a_like = models.IntegerField(default=-1,
+                                    choices=(
+                                        (-1, 'Dislike'),
+                                        (1,  'Like')
+                                    ),
+                                    verbose_name='Is that a like?')
 
     def __str__(self):
         return (('Like' if self.is_a_like else 'Dislike')
