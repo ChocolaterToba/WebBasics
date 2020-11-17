@@ -93,7 +93,7 @@ class Answer(models.Model):
                                          related_query_name="answer")
 
     text = models.TextField(verbose_name='Main text')
-    is_correct = models.BooleanField(verbose_name='Is answer correct?')
+    is_correct = models.BooleanField(verbose_name='Is answer correct?', default=False)
     rating = models.IntegerField(verbose_name='Amount of likes', default=0)
     likes = models.ManyToManyField('Profile', through='AnswerLike',
                                    verbose_name="Likes", blank=True,
@@ -103,9 +103,10 @@ class Answer(models.Model):
 
     def RefreshRating(self):
         self.rating = AnswerLike.objects.GetRating(self.id)
+        self.save()  # Otherwise, new rating will be erased.
 
     def __str__(self):
-        return self.text
+        return self.text[:30] + '...'
 
     class Meta:
         verbose_name = 'Answer'
@@ -135,7 +136,8 @@ class QuestionLike(models.Model):
     objects = QuestionLikeManager()
 
     def __str__(self):
-        return ('Like' if self.is_a_like else 'Dislike') + ' on question: ' + self.question.title
+        return (('Like' if self.is_a_like else 'Dislike')
+               + ' on question: ' + self.question.title)
 
     class Meta:
         verbose_name = 'Like/Dislike on question'
@@ -154,9 +156,10 @@ class AnswerLike(models.Model):
     objects = AnswerLikeManager()
 
     def __str__(self):
-        return ('Like' if self.is_a_like else 'Dislike') + ' on answer: ' + self.answer.text[:10] + '...'
+        return (('Like' if self.is_a_like else 'Dislike')
+                + ' on answer: ' + self.answer.text[:10] + '...')
 
     class Meta:
         verbose_name = 'Like/Dislike on answer'
-        verbose_name_plural = 'Likes/dislikes on answer'
+        verbose_name_plural = 'Likes/dislikes on answers'
         ordering = ['id']
