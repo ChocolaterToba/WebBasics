@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.forms.models import model_to_dict
 from django.db.models.query import QuerySet
-from app.models import Profile, Question, Answer
+from app.models import Profile, Question, Answer, AnswerLike
 from django.contrib.auth.models import User
 
 def paginate(objects_list, request, per_page=10):
@@ -48,15 +48,15 @@ def CheckIfLiked(user, post_or_posts):
             result['tags'] = post_or_posts.tags
 
             # Adding amount of answers.
-            result['answers_amount'] = post_or_posts.AnswersAmount()
+            result['answers_amount'] = post_or_posts.answers.count()
 
         # Adding whether or not user liked/disliked that post.
         result['liked_or_disliked'] =  user.LikedOrDisliked(post_or_posts)
         result['rating'] = post_or_posts.rating
-        print(post_or_posts)
         return result
 
     elif isinstance(post_or_posts, QuerySet):
+        print(AnswerLike.objects.filter(user_id=6))
         if not post_or_posts.exists():
             return []
 
@@ -82,7 +82,8 @@ def question(request, id):
         question = Question.objects.get(id=id)
         return render(request, 'question.html', {
             'question': CheckIfLiked(getBaseProfile(), question),
-            'answers': CheckIfLiked(getBaseProfile(), question.answers.Best().all()),
+            'page': paginate(CheckIfLiked(getBaseProfile(), question.answers.Best().all().prefetch_related('likes')),
+                             request, 5),
             'user': getBaseDict(logged_in=True),
         })
     except:

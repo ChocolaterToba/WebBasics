@@ -17,9 +17,9 @@ f = Faker(['en-US', 'ru_RU'])
 
 QUESTION_LIKES_DENOMINATOR = 5 # 1/Q... of users max like certain post.
 
-ANSWER_LIKES_DENOMINATOR = 7
+ANSWER_LIKES_DENOMINATOR = 5
 
-ANSWER_MAX_AMOUNT = 10 # Maximum amount of answers per question.
+ANSWER_MAX_AMOUNT = 3 # Maximum amount of answers per question.
 
 class Command(BaseCommand):
     help = 'Filling database'
@@ -28,11 +28,28 @@ class Command(BaseCommand):
         parser.add_argument('-u', '--users', type=int, help='Usernames amount')
         parser.add_argument('-q', '--questions', type=int, help='Questions amount')
         parser.add_argument('-t', '--tags', type=int, help='Tags amount')
+        parser.add_argument('-s', '--db_size', type=str, help='Preset amounts')
+        
     
     def handle(self, *args, **kwargs):
         users_cnt = kwargs['users']
         questions_cnt = kwargs['questions']
         tags_cnt = kwargs['tags']
+        db_size = kwargs['db_size']
+        
+        if db_size:
+            if db_size == 'small':
+                users_cnt = 5
+                questions_cnt = 30
+                tags_cnt = 5
+            elif db_size == 'medium':
+                users_cnt = 500
+                questions_cnt = 3000
+                tags_cnt = 500
+            elif db_size == 'large':
+                users_cnt =  10000
+                questions_cnt = 100000
+                tags_cnt = 10000
 
         if users_cnt:
             self.fill_profiles(users_cnt)
@@ -68,8 +85,6 @@ class Command(BaseCommand):
                 avatar='avatars/' + choice(avatar_links),
                 nickname=f.name()[:31]
             )
-    
-    
 
     def fill_questions(self, cnt):
         profile_ids = list(
@@ -109,7 +124,7 @@ class Command(BaseCommand):
             # Setting dislikes (set() will override some of the likes).
             question.likes.set(choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
                                                                                   QUESTION_LIKES_DENOMINATOR))),
-                               through_defaults={'is_a_like': True})
+                               through_defaults={'is_a_like': False})
             question.RefreshRating()
             self.fill_answers(question, f.random_int(min=0, max=ANSWER_MAX_AMOUNT))
     
@@ -141,4 +156,4 @@ class Command(BaseCommand):
     
     def fill_tags(self, cnt):
         for i in range(cnt):
-            Tag.objects.create(name=f.word())
+            Tag.objects.create(name=f.unique.word())

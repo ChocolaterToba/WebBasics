@@ -8,6 +8,7 @@
 
 {% block styles %}
 <link href="{% static 'css/question.css' %}" rel="stylesheet">
+<link href="{% static 'css/bottom_navbar.css' %}" rel="stylesheet">
 {% endblock styles %}
 
 {% block content %}
@@ -16,15 +17,15 @@
   <li>
     <hr id="answersStart">
   </li>
-  {% if answers %}
-    {% for answer in answers %}
+  {% if page %}
+    {% for answer in page %}
       {% include 'inc/one_answer.html' %}
     {% endfor %}
     <li>
       <hr>
     </li>
   {% endif %}
-  <li>
+  <li class="mb-3">
     <form>
       <div class="form-group">
         <textarea class="answer-block form-control" id="question-text" rows="4"
@@ -33,5 +34,6 @@
       <button type="submit" class="answer-block btn btn-outline-dark">Answer</button>
     </form>
   </li>
+  {% include 'inc/bottom_navbar.html' %}
 </ul>
 {% endblock content %}

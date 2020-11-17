@@ -47,7 +47,7 @@ class QuestionManager(models.Manager):
     
     def Hot(self):
         # Hot questions are today's questions with best ratings.
-        return self.filter(publishing_date=datetime.today()).order_by('-rating')
+        return self.order_by('-rating')
     
     def Best(self):
         return self.order_by('-rating')
@@ -70,9 +70,6 @@ class Question(models.Model):
     def RefreshRating(self):
         self.rating = QuestionLike.objects.GetRating(self.id)
         self.save()  # Otherwise, new rating will be erased.
-    
-    def AnswersAmount(self):
-        return self.answers.count()
 
     def __str__(self):
         return self.title
@@ -127,7 +124,7 @@ class Tag(models.Model):
 class QuestionLikeManager(models.Manager):
     def GetRating(self, question_id):
         related_likes = self.filter(question_id=question_id)
-        return related_likes.count() - 2 * related_likes.filter(is_a_like=False).count()
+        return related_likes.filter(is_a_like=True).count() - related_likes.filter(is_a_like=False).count()
 
 class QuestionLike(models.Model):
     user = models.ForeignKey('Profile', on_delete=models.CASCADE)
@@ -147,7 +144,7 @@ class QuestionLike(models.Model):
 class AnswerLikeManager(models.Manager):
     def GetRating(self, answer_id):
         related_likes = self.filter(answer_id=answer_id)
-        return related_likes.count() - 2 * related_likes.filter(is_a_like=False).count()
+        return related_likes.filter(is_a_like=True).count() - related_likes.filter(is_a_like=False).count()
 
 class AnswerLike(models.Model):
     user = models.ForeignKey('Profile', on_delete=models.CASCADE)
