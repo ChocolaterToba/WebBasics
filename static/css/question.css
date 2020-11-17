@@ -9,10 +9,6 @@
     word-wrap: break-word;
 }
 
-.likes-box > img {
-    cursor: pointer;
-}
-
 hr {
     background-color: black;
 }

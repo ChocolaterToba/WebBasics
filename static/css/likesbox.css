@@ -1,0 +1,8 @@
+.likes-box > img {
+    cursor: pointer;
+}
+
+.avatar-likes {
+    flex-basis: 5rem;
+    flex-shrink: 0;
+}

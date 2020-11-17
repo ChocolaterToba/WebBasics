@@ -1,8 +1,9 @@
 {% load static %}
 
-<div class="avatar-likes">
+<div class="avatar-likes d-flex flex-column align-items-center">
   <img src="{{ question.author.avatar.url }}", class="avatar-image", alt="avatar image">
-  <div class="likes-box d-flex flex-column align-items-center mt-2">
+  <p class="nickname">{{ question.author.nickname }}</p>
+  <div class="likes-box d-flex flex-column align-items-center mb-auto">
     {% if question.liked_or_disliked == 'Liked' %}
       <img src="{% static 'img/caret-up-fill.svg' %}" alt="like button">
     {% else %}

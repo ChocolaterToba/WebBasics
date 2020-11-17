@@ -7,7 +7,3 @@
     overflow-wrap: break-word;
     word-wrap: break-word;
 }
-
-.likes-box > img {
-    cursor: pointer;
-}
