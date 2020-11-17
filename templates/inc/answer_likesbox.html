@@ -9,7 +9,7 @@
       <img src="{% static 'img/caret-up.svg' %}" alt="like button">
     {% endif %}
 
-    <h4 class="likes-amount m-0">{{ question.rating }}</h4>
+    <h4 class="likes-amount m-0">{{ answer.rating }}</h4>
 
     {% if answer.liked_or_disliked == 'Disliked' %}
       <img src="{% static 'img/caret-down-fill.svg' %}" alt="like button">

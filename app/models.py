@@ -68,7 +68,8 @@ class Question(models.Model):
     objects = QuestionManager()
 
     def RefreshRating(self):
-        self.rating = self.likes.objects.GetRating()
+        self.rating = QuestionLike.objects.GetRating(self.id)
+        self.save()  # Otherwise, new rating will be erased.
     
     def AnswersAmount(self):
         return self.answers.count()
@@ -101,7 +102,7 @@ class Answer(models.Model):
     objects = AnswerManager()
 
     def RefreshRating(self):
-        self.rating = self.likes.objects.GetRating()
+        self.rating = AnswerLike.objects.GetRating(self.id)
 
     def __str__(self):
         return self.text
@@ -122,15 +123,16 @@ class Tag(models.Model):
         verbose_name_plural = 'Tags'
         ordering = ['name']
 
-class LikeManager(models.Manager):
-    def GetRating(self):
-        return self.objects.count() - 2 * self.filter(is_a_like=False).count()
+class QuestionLikeManager(models.Manager):
+    def GetRating(self, question_id):
+        related_likes = self.filter(question_id=question_id)
+        return related_likes.count() - 2 * related_likes.filter(is_a_like=False).count()
 
 class QuestionLike(models.Model):
     user = models.ForeignKey('Profile', on_delete=models.CASCADE)
     question = models.ForeignKey('Question', on_delete=models.CASCADE)
     is_a_like = models.BooleanField(verbose_name='Is that a like?')
-    objects = LikeManager()
+    objects = QuestionLikeManager()
 
     def __str__(self):
         return 'Question Like'
@@ -140,11 +142,16 @@ class QuestionLike(models.Model):
         verbose_name_plural = 'Likes on questions'
         ordering = ['id']
 
+class AnswerLikeManager(models.Manager):
+    def GetRating(self, answer_id):
+        related_likes = self.filter(answer_id=answer_id)
+        return related_likes.count() - 2 * related_likes.filter(is_a_like=False).count()
+
 class AnswerLike(models.Model):
     user = models.ForeignKey('Profile', on_delete=models.CASCADE)
     answer = models.ForeignKey('Answer', on_delete=models.CASCADE)
     is_a_like = models.BooleanField(verbose_name='Is that a like?')
-    objects = LikeManager()
+    objects = AnswerLikeManager()
 
     def __str__(self):
         return 'Answer Like'

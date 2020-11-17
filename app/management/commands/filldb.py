@@ -72,14 +72,13 @@ class Command(BaseCommand):
             )
         )
         for i in range(cnt):
-            print(i)
             Question.objects.create(
                 author_id=choice(profile_ids),
                 title=f.sentence(nb_words=5)[:256],
                 text='. '.join(f.sentences(f.random_int(min=2, max=7))),
                 publishing_date=f.date_between('-40y', 'today'),
             )
-            Question.objects.last().tags.set(choices(tag_names, k=f.random_int(min=0, max=5)))
+            Question.objects.last().tags.set(choices(tag_names, k=f.random_int(min=0, max=min(5, Tag.objects.count()))))
             Question.objects.last().likes.set(choices(profile_ids, k=f.random_int(min=0, max=len(profile_ids))),
-                                              through_defaults={'is_a_like': True)
+                                              through_defaults={'is_a_like': True})
             Question.objects.last().RefreshRating()

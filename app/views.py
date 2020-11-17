@@ -4,24 +4,37 @@ from django.core.paginator import Paginator
 from django.forms.models import model_to_dict
 from django.db.models.query import QuerySet
 from app.models import Profile, Question, Answer
+from django.contrib.auth.models import User
 
 def paginate(objects_list, request, per_page=10):
     paginator = Paginator(objects_list, per_page)
     page_number = request.GET.get('page')
     return paginator.get_page(page_number)
 
-base_user = Profile.objects.get(id=1)
-base_user_dict = {
-    'user': base_user.user,
-    'avatar': base_user.avatar,
-    'nickname': base_user.nickname,
-}
+def getBaseProfile():
+    if not Profile.objects.filter(nickname='basicNick').exists():
+        if not User.objects.filter(username='basic').exists():
+            User.objects.create_user(
+                'basic',
+                'Toba.ru@mail.ru',
+                'thisismyhair')
+        Profile.objects.create(
+            user=User.objects.get(username='basic'),
+            avatar='avatars/' + 'image1.jpg',
+            nickname='basicNick'
+        )
+    return Profile.objects.get(user__username='basic')
 
-logged_in_user = base_user_dict.copy()
-logged_in_user.update({'logged_in': True})
-
-unlogged_in_user = base_user_dict.copy()
-unlogged_in_user.update({'logged_in': False})
+def getBaseDict(logged_in=True):
+    profile = getBaseProfile()
+    profile_dict = {
+        'user': profile.user,
+        'avatar': profile.avatar,
+        'nickname': profile.nickname,
+    }
+    
+    profile_dict.update({'logged_in': logged_in})
+    return profile_dict
 
 def CheckIfLiked(user, post_or_posts):
     if isinstance(post_or_posts, (Question, Answer)):
@@ -39,6 +52,8 @@ def CheckIfLiked(user, post_or_posts):
 
         # Adding whether or not user liked/disliked that post.
         result['liked_or_disliked'] =  user.LikedOrDisliked(post_or_posts)
+        result['rating'] = post_or_posts.rating
+        print(post_or_posts)
         return result
 
     elif isinstance(post_or_posts, QuerySet):
@@ -50,7 +65,7 @@ def CheckIfLiked(user, post_or_posts):
     raise TypeError('Argument post_or_posts must be either Question, Answer or QuerySet of them')
 
 def index(request):
-    page = paginate(CheckIfLiked(base_user,
+    page = paginate(CheckIfLiked(getBaseProfile(),
                                  Question.objects.New().all().prefetch_related(
                                      'author', 'tags', 'likes'
                                      )
@@ -59,44 +74,44 @@ def index(request):
     return render(request, 'index.html', {
         'page': page,
         'page_end_diff': page.paginator.num_pages - page.number,
-        'user': logged_in_user,
+        'user': getBaseDict(logged_in=True),
     })
 
 def question(request, id):
     try:
         question = Question.objects.get(id=id)
         return render(request, 'question.html', {
-            'question': CheckIfLiked(base_user, question),
-            'answers': CheckIfLiked(base_user, question.answers.Best().all()),
-            'user': logged_in_user,
+            'question': CheckIfLiked(getBaseProfile(), question),
+            'answers': CheckIfLiked(getBaseProfile(), question.answers.Best().all()),
+            'user': getBaseDict(logged_in=True),
         })
     except:
         return render(request, '404.html', {
-            'user': logged_in_user,
+            'user': getBaseDict(logged_in=True),
         })
 
 def ask(request):
     return render(request, 'ask.html', {
-        'user': logged_in_user,
+        'user': getBaseDict(logged_in=True),
     })
 
 def signup(request):
     return render(request, 'signup.html', {
-        'user': unlogged_in_user,
+        'user': getBaseUser(logged_in=False),
     })
 
 def login(request):
     return render(request, 'login.html', {
-        'user': unlogged_in_user,
+        'user': getBaseDict(logged_in=False),
     })
 
 def settings(request):
     return render(request, 'settings.html', {
-        'user': logged_in_user,
+        'user': getBaseDict(logged_in=True),
     })
 
 def tag(request, tag):
-    page = paginate(CheckIfLiked(base_user,
+    page = paginate(CheckIfLiked(getBaseProfile(),
                                  Question.objects.SearchByTag(tag).all().prefetch_related(
                                      'author', 'tags', 'likes'
                                      )
@@ -106,11 +121,11 @@ def tag(request, tag):
         'page': page,
         'page_end_diff': page.paginator.num_pages - page.number,
         'tag': tag,
-        'user': logged_in_user,
+        'user': getBaseDict(logged_in=True),
     })
 
 def hot(request):
-    page = paginate(CheckIfLiked(base_user,
+    page = paginate(CheckIfLiked(getBaseProfile(),
                                  Question.objects.Hot().all().prefetch_related(
                                      'author', 'tags', 'likes'
                                      )
@@ -119,5 +134,5 @@ def hot(request):
     return render(request, 'hot_questions.html', {
         'page': page,
         'page_end_diff': page.paginator.num_pages - page.number,
-        'user': logged_in_user,
+        'user': getBaseDict(logged_in=True),
     })
