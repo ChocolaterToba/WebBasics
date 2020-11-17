@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 
+import time
+
 # App models
 from django.contrib.auth.models import User
 from app.models import Profile, Question, Answer, Tag
@@ -53,21 +55,27 @@ class Command(BaseCommand):
                 tags_cnt = 10000
 
         if users_cnt:
+            print('Generating users...')
             self.fill_profiles(users_cnt)
+            print('Users generated')
         
         if tags_cnt:
+            print('Generating tags...')
             self.fill_tags(tags_cnt)
+            print('Tags generated')
 
         if questions_cnt:
+            print('Generating questions...')
             self.fill_questions(questions_cnt)
+            print('Questions generated')
 
     def fill_users(self, cnt):
-        for i in range(cnt):
-            User.objects.create_user(
-                f.unique.last_name()[:20],
-                f.unique.email(),
-                f.password(length=f.random_int(min=8, max=12))
-            )
+        users_generator = (User(
+            username=f.unique.last_name()[:20],
+            email=f.unique.email(),
+            password=f.password(length=f.random_int(min=8, max=12))
+            ) for i in range(cnt))
+        User.objects.bulk_create(users_generator)
         
     def fill_profiles(self, cnt):
         initial_users_amount = User.objects.count()
