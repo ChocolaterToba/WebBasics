@@ -14,10 +14,11 @@ from faker import Faker
 from random import choice, choices
 
 f = Faker(['en-US', 'ru_RU'])
+Faker.seed(1234)
 
 QUESTION_LIKES_DENOMINATOR = 5 # 1/Q... of users max like certain post.
 
-ANSWER_LIKES_DENOMINATOR = 5
+ANSWER_LIKES_DENOMINATOR = 10
 
 ANSWER_MAX_AMOUNT = 3 # Maximum amount of answers per question.
 
@@ -43,8 +44,8 @@ class Command(BaseCommand):
                 questions_cnt = 30
                 tags_cnt = 5
             elif db_size == 'medium':
-                users_cnt = 500
-                questions_cnt = 3000
+                users_cnt = 100
+                questions_cnt = 5000
                 tags_cnt = 500
             elif db_size == 'large':
                 users_cnt =  10000
@@ -63,7 +64,7 @@ class Command(BaseCommand):
     def fill_users(self, cnt):
         for i in range(cnt):
             User.objects.create_user(
-                f.unique.first_name(),
+                f.unique.last_name()[:20],
                 f.unique.email(),
                 f.password(length=f.random_int(min=8, max=12))
             )
@@ -83,7 +84,7 @@ class Command(BaseCommand):
             Profile.objects.create(
                 user_id=user_ids[i],
                 avatar='avatars/' + choice(avatar_links),
-                nickname=f.name()[:31]
+                nickname=f.first_name()[:31]
             )
 
     def fill_questions(self, cnt):
@@ -109,23 +110,19 @@ class Command(BaseCommand):
 
             # Setting tags.
             question.tags.set(choices(tag_names, k=f.random_int(min=0, max=min(5, Tag.objects.count()))))
-
-            # question.likes.add(choices(profile_ids, k=f.random_int(min=0, max=len(profile_ids) /
-            #                                                                   QUESTION_LIKES_DENOMINATOR)),
-            #                    through_defaults={'is_a_like': f.pybool()})
             
             # Setting likes.
-            # print(choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
-            #                                                                       QUESTION_LIKES_DENOMINATOR))))
-            question.likes.add(*choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
-                                                                                   QUESTION_LIKES_DENOMINATOR))),
+            question.likes.set(choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
+                                                                                  QUESTION_LIKES_DENOMINATOR))),
                                through_defaults={'is_a_like': True})
             
             # Setting dislikes (set() will override some of the likes).
-            question.likes.set(choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
-                                                                                  QUESTION_LIKES_DENOMINATOR))),
+            question.likes.add(*choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
+                                                                                   QUESTION_LIKES_DENOMINATOR))),
                                through_defaults={'is_a_like': False})
-            question.RefreshRating()
+
+            question.rating = QuestionLike.objects.GetRating(question.id)
+            question.save()
             self.fill_answers(question, f.random_int(min=0, max=ANSWER_MAX_AMOUNT))
     
     def fill_answers(self, question, cnt):
@@ -140,19 +137,22 @@ class Command(BaseCommand):
             answer = Answer.objects.create(
                 author_id=choice(profile_ids),
                 related_question_id = question.id,
-                text='. '.join(f.sentences(f.random_int(min=2, max=7))))
+                text='. '.join(f.sentences(f.random_int(min=2, max=7))),
+                is_correct = f.pybool()
+                )
 
 
             # Setting likes.
-            answer.likes.add(*choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
-                                                                                 ANSWER_LIKES_DENOMINATOR))),
-                             through_defaults={'is_a_like': True})
-            
-            # Setting dislikes (set() will override some of the likes).
             answer.likes.set(choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
                                                                                 ANSWER_LIKES_DENOMINATOR))),
                              through_defaults={'is_a_like': True})
-            answer.RefreshRating()
+            
+            # Setting dislikes (set() will override some of the likes).
+            answer.likes.add(*choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
+                                                                                 ANSWER_LIKES_DENOMINATOR))),
+                             through_defaults={'is_a_like': False})
+            answer.rating = QuestionLike.objects.GetRating(answer.id)
+            answer.save()
     
     def fill_tags(self, cnt):
         for i in range(cnt):

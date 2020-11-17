@@ -22,9 +22,9 @@ class Profile(models.Model):
 
         if result_query.exists():
             if isinstance(result_query[0], Question):
-                if (result_query.filter(questionlike__is_a_like=True).exists()):
+                if (result_query.filter(questionlikes__is_a_like=True).exists()):
                     return 'Liked'
-            elif (result_query.filter(answerlike__is_a_like=True).exists()):
+            elif (result_query.filter(answerlikes__is_a_like=True).exists()):
                 return 'Liked'
             return 'Disliked'
 
@@ -42,11 +42,13 @@ class QuestionManager(models.Manager):
     def SearchByTag(self, tag):
         return self.filter(tags__name=tag)
     
+    def HotWithTag(self, tag):
+        return self.SearchByTag(tag).order_by('-rating')
+    
     def New(self):
         return self.order_by('-publishing_date')
     
     def Hot(self):
-        # Hot questions are today's questions with best ratings.
         return self.order_by('-rating')
     
     def Best(self):
@@ -66,10 +68,6 @@ class Question(models.Model):
                                    related_name="liked_questions",
                                    related_query_name="liked_question")
     objects = QuestionManager()
-
-    def RefreshRating(self):
-        self.rating = QuestionLike.objects.GetRating(self.id)
-        self.save()  # Otherwise, new rating will be erased.
 
     def __str__(self):
         return self.title
@@ -98,10 +96,6 @@ class Answer(models.Model):
                                    related_query_name="liked_answer")
     objects = AnswerManager()
 
-    def RefreshRating(self):
-        self.rating = AnswerLike.objects.GetRating(self.id)
-        self.save()  # Otherwise, new rating will be erased.
-
     def __str__(self):
         return self.text[:30] + '...'
 
@@ -128,13 +122,15 @@ class QuestionLikeManager(models.Manager):
 
 class QuestionLike(models.Model):
     user = models.ForeignKey('Profile', on_delete=models.CASCADE)
-    question = models.ForeignKey('Question', on_delete=models.CASCADE)
+    question = models.ForeignKey('Question', on_delete=models.CASCADE,
+                                 related_name="questionlikes")
     is_a_like = models.BooleanField(verbose_name='Is that a like?')
     objects = QuestionLikeManager()
 
     def __str__(self):
-        return (('Like' if self.is_a_like else 'Dislike')
-               + ' on question: ' + self.question.title)
+        return (('Like' if self.is_a_like else 'Dislike') +
+                ' by user: ' + self.user.nickname +
+                ' on question: ' + self.question.title)
 
     class Meta:
         verbose_name = 'Like/Dislike on question'

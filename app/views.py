@@ -56,7 +56,6 @@ def CheckIfLiked(user, post_or_posts):
         return result
 
     elif isinstance(post_or_posts, QuerySet):
-        print(AnswerLike.objects.filter(user_id=6))
         if not post_or_posts.exists():
             return []
 
@@ -80,10 +79,10 @@ def index(request):
 def question(request, id):
     try:
         question = Question.objects.get(id=id)
+        answers = question.answers.Best().all().prefetch_related('likes')
         return render(request, 'question.html', {
             'question': CheckIfLiked(getBaseProfile(), question),
-            'page': paginate(CheckIfLiked(getBaseProfile(), question.answers.Best().all().prefetch_related('likes')),
-                             request, 5),
+            'page': paginate(CheckIfLiked(getBaseProfile(), answers), request, 5),
             'user': getBaseDict(logged_in=True),
         })
     except:
@@ -112,12 +111,10 @@ def settings(request):
     })
 
 def tag(request, tag):
-    page = paginate(CheckIfLiked(getBaseProfile(),
-                                 Question.objects.SearchByTag(tag).all().prefetch_related(
-                                     'author', 'tags', 'likes'
-                                     )
-                                ),
-                    request, 5)
+    questions_query = Question.objects.HotWithTag(tag).all().prefetch_related(
+                          'author', 'tags', 'likes'
+                      )
+    page = paginate(CheckIfLiked(getBaseProfile(), questions_query), request, 5)
     return render(request, 'tag.html', {
         'page': page,
         'page_end_diff': page.paginator.num_pages - page.number,
@@ -126,12 +123,10 @@ def tag(request, tag):
     })
 
 def hot(request):
-    page = paginate(CheckIfLiked(getBaseProfile(),
-                                 Question.objects.Hot().all().prefetch_related(
-                                     'author', 'tags', 'likes'
-                                     )
-                                ),
-                    request, 5)
+    questions_query = Question.objects.Hot().all().prefetch_related(
+                          'author', 'tags', 'likes'
+                      )
+    page = paginate(CheckIfLiked(getBaseProfile(), questions_query), request, 5)
     return render(request, 'hot_questions.html', {
         'page': page,
         'page_end_diff': page.paginator.num_pages - page.number,
