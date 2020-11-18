@@ -53,7 +53,8 @@ def CheckIfLikedInner(user: User, post: Union[Question, Answer]):
 
     # Adding whether or not user liked/disliked that post.
     result['liked_or_disliked'] = post.LikedOrDislikedBy(user)
-    result['rating'] = post.rating
+    if (result['liked_or_disliked'] != 'NoVote'):
+        print(post)
     return result
 
 def CheckIfLiked(user, post_or_posts):

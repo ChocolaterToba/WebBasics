@@ -136,6 +136,7 @@ class QuestionLike(models.Model):
         verbose_name = 'Like/Dislike on question'
         verbose_name_plural = 'Likes/dislikes on questions'
         ordering = ['id']
+        unique_together = ('user_id', 'question_id')
 
 class AnswerLike(models.Model):
     user = models.ForeignKey('Profile', on_delete=models.CASCADE, verbose_name='User that liked')
@@ -157,3 +158,4 @@ class AnswerLike(models.Model):
         verbose_name = 'Like/Dislike on answer'
         verbose_name_plural = 'Likes/dislikes on answers'
         ordering = ['id']
+        unique_together = ('user_id', 'answer_id')
