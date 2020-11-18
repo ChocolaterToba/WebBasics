@@ -217,7 +217,7 @@ class Command(BaseCommand):
             is_a_like=choice((1, -1))
             ) for i in range(question_likes_amount))
 
-        self.bulk_create_in_batches(cnt, question_likes_generator, QuestionLike, True)
+        self.bulk_create_in_batches(question_likes_amount, question_likes_generator, QuestionLike, True)
 
         answer_likes_generator = (AnswerLike(
             user_id=choice(profile_ids),
@@ -225,7 +225,7 @@ class Command(BaseCommand):
             is_a_like=choice((1, -1))
             ) for i in range(answer_likes_amount))
 
-        self.bulk_create_in_batches(cnt, answer_likes_generator, AnswerLike, True)
+        self.bulk_create_in_batches(answer_likes_amount, answer_likes_generator, AnswerLike, True)
     
     def fill_tags(self, cnt):
         tags_generator = (Tag(
