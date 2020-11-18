@@ -163,5 +163,7 @@ class Command(BaseCommand):
             answer.save()
     
     def fill_tags(self, cnt):
-        for i in range(cnt):
-            Tag.objects.create(name=f.unique.word())
+        tags_generator = (Tag(
+            name=f.unique.word()
+            ) for i in range(cnt))
+        Tag.objects.bulk_create(list(tags_generator))
