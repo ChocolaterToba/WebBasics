@@ -2,6 +2,8 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 import time
+from itertools import islice, chain
+from math import ceil
 
 # App models
 from django.contrib.auth.models import User
@@ -19,11 +21,7 @@ from random import choice, choices
 f = Faker(['en-US', 'ru_RU'])
 Faker.seed(1234)
 
-QUESTION_LIKES_DENOMINATOR = 5 # 1/Q... of users max like certain post.
-
-ANSWER_LIKES_DENOMINATOR = 10
-
-ANSWER_MAX_AMOUNT = 10 # Maximum amount of answers per question.
+BATCH_SIZE = 100000  #  Batch size for bulk_create
 
 class Command(BaseCommand):
     help = 'Filling database'
@@ -61,9 +59,9 @@ class Command(BaseCommand):
             elif db_size == 'large':
                 users_cnt =  10000
                 questions_cnt = 100000
-                answers_cnt = 100000
+                answers_cnt = 1000000
                 tags_cnt = 10000
-                likes_cnt = 1000000
+                likes_cnt = 2000000
 
         if users_cnt:
             print('Generating users...')
@@ -103,7 +101,11 @@ class Command(BaseCommand):
         
         if likes_cnt:
             print('Generating likes...')
+            start_time = time.time()
             self.fill_likes(likes_cnt)
+            print('Likes generated, time: {}s'.format(time.time() - start_time))
+            
+            print('Refreshing ratings')
             with transaction.atomic():
                 for question in Question.objects.all():
                     question.rating = sum(question.questionlikes.values_list('is_a_like', flat=True))
@@ -112,8 +114,7 @@ class Command(BaseCommand):
                 for answer in Answer.objects.all():
                     answer.rating = sum(answer.answerlikes.values_list('is_a_like', flat=True))
                     answer.save()
-
-            print('Likes generated')
+            print('Ratings refreshed')
 
     def fill_users(self, cnt):
         users_generator = (User(
@@ -121,7 +122,8 @@ class Command(BaseCommand):
             email=f.unique.email(),
             password=f.password(length=f.random_int(min=8, max=12))
             ) for i in range(cnt))
-        User.objects.bulk_create(users_generator)
+
+        self.bulk_create_in_batches(cnt, users_generator, User)
         
     def fill_profiles(self, cnt):
         initial_users_amount = User.objects.count()
@@ -140,7 +142,8 @@ class Command(BaseCommand):
             avatar='avatars/' + choice(avatar_links),
             nickname=f.first_name()[:31]
             ) for i in range(cnt))
-        Profile.objects.bulk_create(profiles_generator)
+
+        self.bulk_create_in_batches(cnt, profiles_generator, Profile)
 
     def fill_questions(self, cnt):
         profile_ids = list(
@@ -161,7 +164,8 @@ class Command(BaseCommand):
             text='. '.join(f.sentences(f.random_int(min=2, max=7))),
             publishing_date=f.date_between('-40y', 'today')
             ) for i in range(cnt))
-        Question.objects.bulk_create(questions_generator)
+        
+        self.bulk_create_in_batches(cnt, questions_generator, Question)
     
     def fill_answers(self, cnt):
         profile_ids = list(
@@ -182,7 +186,8 @@ class Command(BaseCommand):
             text='. '.join(f.sentences(f.random_int(min=2, max=10))),
             is_correct = f.pybool()
             ) for i in range(cnt))
-        Answer.objects.bulk_create(answers_generator)
+        
+        self.bulk_create_in_batches(cnt, answers_generator, Answer)
     
     def fill_likes(self, cnt):
         profile_ids = list(
@@ -211,19 +216,31 @@ class Command(BaseCommand):
             question_id=choice(question_ids),
             is_a_like=choice((1, -1))
             ) for i in range(question_likes_amount))
-        QuestionLike.objects.bulk_create(question_likes_generator,
-                                         ignore_conflicts=True)
+
+        self.bulk_create_in_batches(cnt, question_likes_generator, QuestionLike, True)
 
         answer_likes_generator = (AnswerLike(
             user_id=choice(profile_ids),
             answer_id=choice(answer_ids),
             is_a_like=choice((1, -1))
             ) for i in range(answer_likes_amount))
-        AnswerLike.objects.bulk_create(answer_likes_generator,
-                                       ignore_conflicts=True)
+
+        self.bulk_create_in_batches(cnt, answer_likes_generator, AnswerLike, True)
     
     def fill_tags(self, cnt):
         tags_generator = (Tag(
-            name=f.unique.word()
+            name='Tag' + str(f.unique.random_int(min=0, max=100000))
             ) for i in range(cnt))
-        Tag.objects.bulk_create(tags_generator)
+        
+        self.bulk_create_in_batches(cnt, tags_generator, Tag)
+    
+    def bulk_create_in_batches(self, cnt, generator, model_type, ignore_conflicts=False):
+        if cnt > BATCH_SIZE:
+            batch_amount = ceil(cnt / BATCH_SIZE)
+            for i in range(batch_amount):
+                batch = islice(generator, BATCH_SIZE)
+                model_type.objects.bulk_create(generator, BATCH_SIZE,
+                                               ignore_conflicts=ignore_conflicts)
+        else:
+            model_type.objects.bulk_create(generator,
+                                           ignore_conflicts=ignore_conflicts)
