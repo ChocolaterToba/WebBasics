@@ -2,7 +2,7 @@ from typing import Union
 
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, Page
 from django.forms.models import model_to_dict
 from django.db.models.query import QuerySet
 
@@ -53,15 +53,16 @@ def CheckIfLikedInner(user: User, post: Union[Question, Answer]):
 
     # Adding whether or not user liked/disliked that post.
     result['liked_or_disliked'] = post.LikedOrDislikedBy(user)
-    if (result['liked_or_disliked'] != 'NoVote'):
-        print(post)
     return result
 
-def CheckIfLiked(user, post_or_posts):
-    if isinstance(post_or_posts, QuerySet):
+def CheckIfLiked(user, post_posts_page):
+    if isinstance(post_posts_page, QuerySet):
         return [CheckIfLikedInner(user, post)
-                for post in post_or_posts]
-    return CheckIfLikedInner(user, post_or_posts)
+                for post in post_posts_page]
+    if isinstance(post_posts_page, Page):
+        post_posts_page.object_list = CheckIfLiked(user, post_posts_page.object_list)
+        return post_posts_page
+    return CheckIfLikedInner(user, post_posts_page)
 
 
 
@@ -69,9 +70,9 @@ def index(request):
     questions = Question.objects.New().all().prefetch_related(
                     'author', 'tags', 'likes'
                 )
-    page = paginate(CheckIfLiked(getBaseProfile(), questions), request, 5)
+    page = paginate(questions, request, 5)
     return render(request, 'index.html', {
-        'page': page,
+        'page': CheckIfLiked(getBaseProfile(), page),
         'page_end_diff': page.paginator.num_pages - page.number,
         'user': getBaseDict(logged_in=True),
     })
@@ -80,9 +81,10 @@ def question(request, id):
     try:
         question = Question.objects.get(id=id)
         answers = question.answers.Best().all().prefetch_related('likes')
+        answer_page = paginate(answers, request, 5)
         return render(request, 'question.html', {
             'question': CheckIfLiked(getBaseProfile(), question),
-            'page': paginate(CheckIfLiked(getBaseProfile(), answers), request, 5),
+            'page': CheckIfLiked(getBaseProfile(), answer_page),
             'user': getBaseDict(logged_in=True),
         })
     except:
@@ -114,11 +116,10 @@ def tag(request, tag):
     questions = Question.objects.HotWithTag(tag).all().prefetch_related(
                     'author', 'tags', 'likes'
                 )
-    page = paginate(CheckIfLiked(getBaseProfile(), questions), request, 5)
-    return render(request, 'tag.html', {
-        'page': page,
+    page = paginate(questions, request, 5)
+    return render(request, 'index.html', {
+        'page': CheckIfLiked(getBaseProfile(), page),
         'page_end_diff': page.paginator.num_pages - page.number,
-        'tag': tag,
         'user': getBaseDict(logged_in=True),
     })
 
@@ -126,9 +127,9 @@ def hot(request):
     questions = Question.objects.Hot().all().prefetch_related(
                     'author', 'tags', 'likes'
                 )
-    page = paginate(CheckIfLiked(getBaseProfile(), questions), request, 5)
-    return render(request, 'hot_questions.html', {
-        'page': page,
+    page = paginate(questions, request, 5)
+    return render(request, 'index.html', {
+        'page': CheckIfLiked(getBaseProfile(), page),
         'page_end_diff': page.paginator.num_pages - page.number,
         'user': getBaseDict(logged_in=True),
     })

@@ -51,13 +51,13 @@ class Command(BaseCommand):
                 questions_cnt = 30
                 answers_cnt = 60
                 tags_cnt = 10
-                likes_cnt = 100
+                likes_cnt = 1000
             elif db_size == 'medium':
                 users_cnt = 1000
                 questions_cnt = 5000
                 answers_cnt = 10000
                 tags_cnt = 500
-                likes_cnt = 10000
+                likes_cnt = 100000
             elif db_size == 'large':
                 users_cnt =  10000
                 questions_cnt = 100000
@@ -69,6 +69,22 @@ class Command(BaseCommand):
             print('Generating users...')
             self.fill_profiles(users_cnt)
             print('Users generated')
+        base_user, created = User.objects.get_or_create(
+            username='basic',
+            defaults={
+                'username': 'basic',
+                'email': 'Example@mail.ru',
+                'password': 'thisismyhair'
+            }
+        )
+        base_profile, created = Profile.objects.get_or_create(
+            user_id=base_user.id,
+            defaults={
+                'user_id': base_user.id,
+                'avatar': 'avatars/image1.jpg',
+                'nickname': 'basicNick'
+            }
+        )
         
         if tags_cnt:
             print('Generating tags...')
