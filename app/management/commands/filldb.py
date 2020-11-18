@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 
 import time
 
@@ -22,7 +23,7 @@ QUESTION_LIKES_DENOMINATOR = 5 # 1/Q... of users max like certain post.
 
 ANSWER_LIKES_DENOMINATOR = 10
 
-ANSWER_MAX_AMOUNT = 3 # Maximum amount of answers per question.
+ANSWER_MAX_AMOUNT = 10 # Maximum amount of answers per question.
 
 class Command(BaseCommand):
     help = 'Filling database'
@@ -30,29 +31,39 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-u', '--users', type=int, help='Usernames amount')
         parser.add_argument('-q', '--questions', type=int, help='Questions amount')
+        parser.add_argument('-a', '--answers', type=int, help='Answers amount')
         parser.add_argument('-t', '--tags', type=int, help='Tags amount')
+        parser.add_argument('-l', '--likes', type=int, help='Total likes amount')
         parser.add_argument('-s', '--db_size', type=str, help='Preset amounts')
         
     
     def handle(self, *args, **kwargs):
         users_cnt = kwargs['users']
         questions_cnt = kwargs['questions']
+        answers_cnt = kwargs['answers']
         tags_cnt = kwargs['tags']
+        likes_cnt = kwargs['likes']
         db_size = kwargs['db_size']
         
         if db_size:
             if db_size == 'small':
                 users_cnt = 20
                 questions_cnt = 30
+                answers_cnt = 60
                 tags_cnt = 10
+                likes_cnt = 100
             elif db_size == 'medium':
-                users_cnt = 100
+                users_cnt = 1000
                 questions_cnt = 5000
+                answers_cnt = 10000
                 tags_cnt = 500
+                likes_cnt = 10000
             elif db_size == 'large':
                 users_cnt =  10000
                 questions_cnt = 100000
+                answers_cnt = 100000
                 tags_cnt = 10000
+                likes_cnt = 1000000
 
         if users_cnt:
             print('Generating users...')
@@ -68,10 +79,29 @@ class Command(BaseCommand):
             print('Generating questions...')
             self.fill_questions(questions_cnt)
             print('Questions generated')
+        
+        if answers_cnt:
+            print('Generating answers...')
+            self.fill_answers(answers_cnt)
+            print('Answers generated')
+        
+        if likes_cnt:
+            print('Generating likes...')
+            self.fill_likes(likes_cnt)
+            with transaction.atomic():
+                for question in Question.objects.all():
+                    question.rating = sum(question.questionlikes.values_list('is_a_like', flat=True))
+                    question.save()
+                
+                for answer in Answer.objects.all():
+                    answer.rating = sum(answer.answerlikes.values_list('is_a_like', flat=True))
+                    answer.save()
+
+            print('Likes generated')
 
     def fill_users(self, cnt):
         users_generator = (User(
-            username=f.unique.last_name()[:20],
+            username=f.unique.name(),
             email=f.unique.email(),
             password=f.password(length=f.random_int(min=8, max=12))
             ) for i in range(cnt))
@@ -88,12 +118,13 @@ class Command(BaseCommand):
 
         avatars_path = 'uploads/avatars/'
         avatar_links = [f for f in listdir(avatars_path) if isfile(join(avatars_path, f))]
-        for i in range(cnt):
-            Profile.objects.create(
-                user_id=user_ids[i],
-                avatar='avatars/' + choice(avatar_links),
-                nickname=f.first_name()[:31]
-            )
+
+        profiles_generator = (Profile(
+            user_id=user_ids[i],
+            avatar='avatars/' + choice(avatar_links),
+            nickname=f.first_name()[:31]
+            ) for i in range(cnt))
+        Profile.objects.bulk_create(profiles_generator)
 
     def fill_questions(self, cnt):
         profile_ids = list(
@@ -108,62 +139,75 @@ class Command(BaseCommand):
             )
         )
 
-        for i in range(cnt):
-            question = Question.objects.create(
-                author_id=choice(profile_ids),
-                title=f.sentence(nb_words=5)[:256],
-                text='. '.join(f.sentences(f.random_int(min=2, max=7))),
-                publishing_date=f.date_between('-40y', 'today'),
-            )
-
-            # Setting tags.
-            question.tags.set(choices(tag_names, k=f.random_int(min=0, max=min(5, Tag.objects.count()))))
-            
-            # Setting likes.
-            question.likes.set(choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
-                                                                                  QUESTION_LIKES_DENOMINATOR))),
-                               through_defaults={'is_a_like': 1})
-            
-            # Setting dislikes (set() will override some of the likes).
-            question.likes.add(*choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
-                                                                                   QUESTION_LIKES_DENOMINATOR))),
-                               through_defaults={'is_a_like': -1})
-
-            question.rating = sum(question.questionlikes.values_list('is_a_like', flat=True))
-            question.save()
-            self.fill_answers(question, f.random_int(min=0, max=ANSWER_MAX_AMOUNT))
+        questions_generator = (Question(
+            author_id=choice(profile_ids),
+            title=f.sentence(nb_words=5)[:256],
+            text='. '.join(f.sentences(f.random_int(min=2, max=7))),
+            publishing_date=f.date_between('-40y', 'today')
+            ) for i in range(cnt))
+        Question.objects.bulk_create(questions_generator)
     
-    def fill_answers(self, question, cnt):
+    def fill_answers(self, cnt):
         profile_ids = list(
             Profile.objects.values_list(
                 'id', flat=True
             )
         )
-        profile_ids.remove(question.author_id)
+        
+        question_ids = list(
+            Question.objects.values_list(
+                'id', flat=True
+            )
+        )
 
-        for i in range(cnt):
-            answer = Answer.objects.create(
-                author_id=choice(profile_ids),
-                related_question_id = question.id,
-                text='. '.join(f.sentences(f.random_int(min=2, max=7))),
-                is_correct = f.pybool()
-                )
+        answers_generator = (Answer(
+            author_id=choice(profile_ids),
+            related_question_id = choice(question_ids),
+            text='. '.join(f.sentences(f.random_int(min=2, max=10))),
+            is_correct = f.pybool()
+            ) for i in range(cnt))
+        Answer.objects.bulk_create(answers_generator)
+    
+    def fill_likes(self, cnt):
+        profile_ids = list(
+            Profile.objects.values_list(
+                'id', flat=True
+            )
+        )
 
+        question_ids = list(
+            Question.objects.values_list(
+                'id', flat=True
+            )
+        )
 
-            # Setting likes.
-            answer.likes.set(choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
-                                                                                ANSWER_LIKES_DENOMINATOR))),
-                             through_defaults={'is_a_like': 1})
-            
-            # Setting dislikes (set() will override some of the likes).
-            answer.likes.add(*choices(profile_ids, k=f.random_int(min=0, max=int(len(profile_ids) /
-                                                                                 ANSWER_LIKES_DENOMINATOR))),
-                             through_defaults={'is_a_like': -1})
-            answer.rating = sum(answer.answerlikes.values_list('is_a_like', flat=True))
-            answer.save()
+        answer_ids = list(
+            Answer.objects.values_list(
+                'id', flat=True
+            )
+        )
+
+        question_likes_amount = int(cnt / 2)
+        answer_likes_amount = cnt - question_likes_amount
+
+        question_likes_generator = (QuestionLike(
+            user_id=choice(profile_ids),
+            question_id=choice(question_ids),
+            is_a_like=choice((1, -1))
+            ) for i in range(question_likes_amount))
+        QuestionLike.objects.bulk_create(question_likes_generator,
+                                         ignore_conflicts=True)
+
+        answer_likes_generator = (AnswerLike(
+            user_id=choice(profile_ids),
+            answer_id=choice(answer_ids),
+            is_a_like=choice((1, -1))
+            ) for i in range(answer_likes_amount))
+        AnswerLike.objects.bulk_create(answer_likes_generator,
+                                       ignore_conflicts=True)
     
     def fill_tags(self, cnt):
         tags_generator = (Tag(
             name=f.unique.word()
             ) for i in range(cnt))
-        Tag.objects.bulk_create(list(tags_generator))
+        Tag.objects.bulk_create(tags_generator)
