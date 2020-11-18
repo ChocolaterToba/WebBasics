@@ -237,9 +237,11 @@ class Command(BaseCommand):
     def bulk_create_in_batches(self, cnt, generator, model_type, ignore_conflicts=False):
         if cnt > BATCH_SIZE:
             batch_amount = ceil(cnt / BATCH_SIZE)
+            print('\n' + str(batch_amount) + '\n')
             for i in range(batch_amount):
+                print(i)
                 batch = islice(generator, BATCH_SIZE)
-                model_type.objects.bulk_create(generator, BATCH_SIZE,
+                model_type.objects.bulk_create(batch, BATCH_SIZE,
                                                ignore_conflicts=ignore_conflicts)
         else:
             model_type.objects.bulk_create(generator,
