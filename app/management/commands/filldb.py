@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+from django.db.models import Sum, OuterRef, Subquery
+from django.db.models.functions import Coalesce
 
 import time
 from itertools import islice, chain
@@ -62,6 +64,8 @@ class Command(BaseCommand):
                 answers_cnt = 1000000
                 tags_cnt = 10000
                 likes_cnt = 2000000
+        
+        start_time = time.time()
 
         if users_cnt:
             print('Generating users...')
@@ -106,15 +110,38 @@ class Command(BaseCommand):
             print('Likes generated, time: {}s'.format(time.time() - start_time))
             
             print('Refreshing ratings')
-            with transaction.atomic():
-                for question in Question.objects.all():
-                    question.rating = sum(question.questionlikes.values_list('is_a_like', flat=True))
-                    question.save()
+            Question.objects.update(
+                rating=Subquery(
+                    Question.objects.filter(
+                        id=OuterRef('id')
+                    ).annotate(
+                        new_rating=Coalesce(Sum('questionlikes__is_a_like'), 0)
+                    ).values('new_rating')[:1] 
+                )
+            )
+            Answer.objects.update(
+                rating=Subquery(
+                    Answer.objects.filter(
+                        id=OuterRef('id')
+                    ).annotate(
+                        new_rating=Coalesce(Sum('answerlikes__is_a_like'), 0)
+                    ).values('new_rating')[:1] 
+                )
+            )
+            # batch_amount = ceil(likes_cnt / 2 / BATCH_SIZE)
+            # for i in range(batch_amount):
+            #     with transaction.atomic():
+            #         for question in Question.objects.all()[i * BATCH_SIZE: (i + 1) * BATCH_SIZE]:
+            #             question.rating = sum(question.questionlikes.values_list('is_a_like', flat=True))
+            #             question.save()
                 
-                for answer in Answer.objects.all():
-                    answer.rating = sum(answer.answerlikes.values_list('is_a_like', flat=True))
-                    answer.save()
+            #     with transaction.atomic():
+            #         for answer in Answer.objects.all()[i * BATCH_SIZE: (i + 1) * BATCH_SIZE]:
+            #             answer.rating = sum(answer.answerlikes.values_list('is_a_like', flat=True))
+            #             answer.save()
             print('Ratings refreshed')
+        
+        print('Total time: {}s'.format(time.time()  - start_time))
 
     def fill_users(self, cnt):
         users_generator = (User(
