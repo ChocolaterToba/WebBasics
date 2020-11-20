@@ -35,6 +35,8 @@ class Command(BaseCommand):
         parser.add_argument('-t', '--tags', type=int, help='Tags amount')
         parser.add_argument('-l', '--likes', type=int, help='Total likes amount')
         parser.add_argument('-s', '--db_size', type=str, help='Preset amounts')
+
+        parser.add_argument('-f', '--fill_tags', type=int, help='FillTags')  # DELETE LATER!!!
         
     
     def handle(self, *args, **kwargs):
@@ -44,6 +46,21 @@ class Command(BaseCommand):
         tags_cnt = kwargs['tags']
         likes_cnt = kwargs['likes']
         db_size = kwargs['db_size']
+        fill_tags = kwargs['fill_tags']
+        if fill_tags:  # DELETE LATER!!!
+            tag_names = list(
+                Tag.objects.values_list(
+                    'name', flat=True
+                )
+            )
+            max_tags_per_question = min(7, len(tag_names))
+            tags_avg = max_tags_per_question / 2
+            batch_amount = ceil(100000 / tags_avg / BATCH_SIZE)
+            for i in range(batch_amount):
+                with transaction.atomic():
+                    for question in Question.objects.all()[i * BATCH_SIZE: (i + 1) * BATCH_SIZE]:
+                        question.tags.set(choices(tag_names, k=f.random_int(min=0, max=max_tags_per_question)))
+                        question.save()
         
         if db_size:
             if db_size == 'small':
@@ -71,6 +88,7 @@ class Command(BaseCommand):
             print('Generating users...')
             self.fill_profiles(users_cnt)
             print('Users generated')
+
         base_user, created = User.objects.get_or_create(
             username='basic',
             defaults={
@@ -95,8 +113,29 @@ class Command(BaseCommand):
 
         if questions_cnt:
             print('Generating questions...')
+            start_questions_time = time.time()
             self.fill_questions(questions_cnt)
-            print('Questions generated')
+            print('Questions generated, time: {}s'.format(time.time() - start_questions_time))
+
+            print('Updating tags...')
+            start_tags_time = time.time()
+
+            tag_names = list(
+                Tag.objects.values_list(
+                    'name', flat=True
+                )
+            )
+
+            max_tags_per_question = min(7, len(tag_names))
+            tags_avg = max_tags_per_question / 2
+            batch_amount = ceil(100000 / tags_avg / BATCH_SIZE)
+            for i in range(batch_amount):
+                with transaction.atomic():
+                    for question in Question.objects.all()[i * BATCH_SIZE: (i + 1) * BATCH_SIZE]:
+                        question.tags.set(choices(tag_names, k=f.random_int(min=0, max=max_tags_per_question)))
+                        question.save()
+
+            print('Tags updated, time: {} s'.format(time.time() - start_tags_time))
         
         if answers_cnt:
             print('Generating answers...')
@@ -105,9 +144,9 @@ class Command(BaseCommand):
         
         if likes_cnt:
             print('Generating likes...')
-            start_time = time.time()
+            start_likes_time = time.time()
             self.fill_likes(likes_cnt)
-            print('Likes generated, time: {}s'.format(time.time() - start_time))
+            print('Likes generated, time: {}s'.format(time.time() - start_likes_time))
             
             print('Refreshing ratings')
             Question.objects.update(
@@ -119,6 +158,7 @@ class Command(BaseCommand):
                     ).values('new_rating')[:1] 
                 )
             )
+            print('Question ratings refreshed')
             Answer.objects.update(
                 rating=Subquery(
                     Answer.objects.filter(
@@ -128,18 +168,7 @@ class Command(BaseCommand):
                     ).values('new_rating')[:1] 
                 )
             )
-            # batch_amount = ceil(likes_cnt / 2 / BATCH_SIZE)
-            # for i in range(batch_amount):
-            #     with transaction.atomic():
-            #         for question in Question.objects.all()[i * BATCH_SIZE: (i + 1) * BATCH_SIZE]:
-            #             question.rating = sum(question.questionlikes.values_list('is_a_like', flat=True))
-            #             question.save()
-                
-            #     with transaction.atomic():
-            #         for answer in Answer.objects.all()[i * BATCH_SIZE: (i + 1) * BATCH_SIZE]:
-            #             answer.rating = sum(answer.answerlikes.values_list('is_a_like', flat=True))
-            #             answer.save()
-            print('Ratings refreshed')
+            print('Answer ratings refreshed')
         
         print('Total time: {}s'.format(time.time()  - start_time))
 
@@ -153,13 +182,12 @@ class Command(BaseCommand):
         self.bulk_create_in_batches(cnt, users_generator, User)
         
     def fill_profiles(self, cnt):
-        initial_users_amount = User.objects.count()
         self.fill_users(cnt)
-        user_ids = sorted(list(
+        user_ids = list(
             User.objects.values_list(
                 'id', flat=True
             )
-        ))[initial_users_amount:]
+        )
 
         avatars_path = 'uploads/avatars/'
         avatar_links = [f for f in listdir(avatars_path) if isfile(join(avatars_path, f))]
@@ -176,12 +204,6 @@ class Command(BaseCommand):
         profile_ids = list(
             Profile.objects.values_list(
                 'id', flat=True
-            )
-        )
-
-        tag_names = list(
-            Tag.objects.values_list(
-                'name', flat=True
             )
         )
 
