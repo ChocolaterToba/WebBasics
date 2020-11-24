@@ -9,6 +9,7 @@ from math import ceil
 
 # App models
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
 from app.models import Profile, Question, Answer, Tag
 from app.models import QuestionLike, AnswerLike
 
@@ -94,7 +95,7 @@ class Command(BaseCommand):
             defaults={
                 'username': 'basic',
                 'email': 'Example@mail.ru',
-                'password': 'thisismyhair'
+                'password': make_password('thisismyhair')
             }
         )
         base_profile, created = Profile.objects.get_or_create(
@@ -176,8 +177,10 @@ class Command(BaseCommand):
         users_generator = (User(
             username=f.unique.name(),
             email=f.unique.email(),
-            password=f.password(length=f.random_int(min=8, max=12))
-            ) for i in range(cnt))
+            password=make_password(  #  Slow, but secure.
+                f.password(length=f.random_int(min=8, max=12))
+            )
+        ) for i in range(cnt))
 
         self.bulk_create_in_batches(cnt, users_generator, User)
         
