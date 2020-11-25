@@ -3,6 +3,7 @@ from typing import Union
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator, Page
+
 from django.forms.models import model_to_dict
 from django.db.models.query import QuerySet
 
@@ -10,9 +11,9 @@ from app.models import Profile, Question, Answer
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import logout as auth_logout
 
 from app.forms import *
-
 
 def paginate(objects_list, request, per_page=10):
     paginator = Paginator(objects_list, per_page)
@@ -127,9 +128,15 @@ def signup(request):
 
 def login(request):
     user = request.user
-    next_page = request.POST.get('continue')
+    if request.method == "POST":
+        next_page = request.POST.get('continue', default='/index/')
+    elif request.method == "GET":
+        next_page = request.GET.get('continue', default='/index/')
+    else:
+        next_page = '/index/'
+
     if user.is_authenticated:
-        return redirect('/index/')
+        return redirect(next_page)
 
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -140,33 +147,25 @@ def login(request):
             )
             if user is not None:
                 auth_login(request, user)
-
-                if not next_page:
-                    return redirect(index)
                 return redirect(next_page)
+
             else:
-                if next_page:
-                    return render(request, 'login.html?continue=' + next_page, {
-                        'user': user,
-                        'form': form,
-                        'error': 'Error during login',
-                    })
                 return render(request, 'login.html', {
                     'user': user,
                     'form': form,
                     'error': 'Error during login',
                 })
+
     else:
         form = LoginForm()
-        if next_page:
-            return render(request, 'login.html?continue=' + next_page, {
-                'user': user,
-                'form': form,
-            })
         return render(request, 'login.html', {
             'user': user,
             'form': form,
         })
+
+def logout(request):
+    auth_logout(request)
+    return redirect(index)
 
 def settings(request):
     return render(request, 'settings.html', {
@@ -194,3 +193,5 @@ def hot(request):
         'page_end_diff': page.paginator.num_pages - page.number,
         'user': request.user,
     })
+
+

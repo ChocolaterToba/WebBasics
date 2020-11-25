@@ -32,4 +32,5 @@ urlpatterns = [
     path('settings/', views.settings, name='settings'),
     path('tag/<str:tag>/', views.tag, name='tag'),
     path('hot/', views.hot, name='hot'),
+    path('logout/', views.logout, name='logout'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -19,13 +19,13 @@
             <li class="account-name">{{ user.profile.nickname }}</li>
             <li>
               <a id="settings-link" href="{% url 'settings' %}">Settings</a>
-              <a id="logout-link" href="{% url 'login' %}">LogOut</a>
+              <a id="logout-link" href="{% url 'logout' %}">LogOut</a>
             </li>
           </ul>
         </li>
       {% else %}
-        <li><a class="log-in-link mr-3" href="{% url 'login' %}">Log in</a></li>
-        <li><a class="sign-up-link" href="{% url 'signup' %}">Sign up</a></li>
+        <li><a class="log-in-link mr-3" href="{% url 'login' %}?continue={{ request.url }}">Log in</a></li>
+        <li><a class="sign-up-link" href="{% url 'signup' %}?continue={{ request.url }}">Sign up</a></li>
       {% endif %}
     </ul>
   </div>
