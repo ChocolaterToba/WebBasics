@@ -214,7 +214,7 @@ class Command(BaseCommand):
         questions_generator = (Question(
             author_id=choice(profile_ids),
             title=f.sentence(nb_words=5)[:256],
-            text='. '.join(f.sentences(f.random_int(min=2, max=7))),
+            text=' '.join(f.sentences(f.random_int(min=2, max=7))),
             publishing_date=f.date_between('-40y', 'today')
             ) for i in range(cnt))
         
@@ -236,7 +236,7 @@ class Command(BaseCommand):
         answers_generator = (Answer(
             author_id=choice(profile_ids),
             related_question_id = choice(question_ids),
-            text='. '.join(f.sentences(f.random_int(min=2, max=10))),
+            text=' '.join(f.sentences(f.random_int(min=2, max=10))),
             is_correct = f.pybool()
             ) for i in range(cnt))
         

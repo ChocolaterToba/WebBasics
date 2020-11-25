@@ -221,7 +221,7 @@ def tag(request, tag):
                 )
     page = paginate(questions, request, 5)
     return render(request, 'index.html', {
-        'page': CheckIfLiked(getBaseProfile(), page),
+        'page': CheckIfLiked(request.user, page),
         'page_end_diff': page.paginator.num_pages - page.number,
         'user': request.user,
         }
@@ -233,7 +233,7 @@ def hot(request):
                 )
     page = paginate(questions, request, 5)
     return render(request, 'index.html', {
-        'page': CheckIfLiked(getBaseProfile(), page),
+        'page': CheckIfLiked(request.user, page),
         'page_end_diff': page.paginator.num_pages - page.number,
         'user': request.user,
         }
