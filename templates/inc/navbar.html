@@ -19,7 +19,7 @@
             <li class="account-name">{{ user.profile.nickname }}</li>
             <li>
               <a id="settings-link" href="{% url 'settings' %}">Settings</a>
-              <a id="logout-link" href="{% url 'logout' %}">LogOut</a>
+              <a id="logout-link" href="{% url 'logout' %}?continue={{ request.path }}">LogOut</a>
             </li>
           </ul>
         </li>

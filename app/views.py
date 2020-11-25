@@ -160,8 +160,9 @@ def login(request):
         })
 
 def logout(request):
+    next_page = request.GET.get('continue', default='/index/')
     auth_logout(request)
-    return redirect(index)
+    return redirect(next_page)
 
 def settings(request):
     return render(request, 'settings.html', {
