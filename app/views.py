@@ -1,13 +1,17 @@
 from typing import Union
 
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.core.paginator import Paginator, Page
 from django.forms.models import model_to_dict
 from django.db.models.query import QuerySet
 
 from app.models import Profile, Question, Answer
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import authenticate, login as auth_login
+
+from app.forms import *
 
 
 def paginate(objects_list, request, per_page=10):
@@ -21,7 +25,7 @@ def getBaseProfile():
         defaults={
             'username': 'basic',
             'email': 'Example@mail.ru',
-            'password': 'thisismyhair'
+            'password': make_password('thisismyhair'),
         }
     )
     base_profile, created = Profile.objects.get_or_create(
@@ -29,7 +33,7 @@ def getBaseProfile():
         defaults={
             'user_id': base_user.id,
             'avatar': 'avatars/image1.jpg',
-            'nickname': 'basicNick'
+            'nickname': 'basicNick',
         }
     )
 
@@ -52,7 +56,8 @@ def CheckIfLikedInner(user: User, post: Union[Question, Answer]):
         result['answers_amount'] = post.answers.count()
 
     # Adding whether or not user liked/disliked that post.
-    result['liked_or_disliked'] = post.LikedOrDislikedBy(user)
+    if user is not None:
+        result['liked_or_disliked'] = post.LikedOrDislikedBy(user)
     return result
 
 def CheckIfLiked(user, post_posts_page):
@@ -65,16 +70,22 @@ def CheckIfLiked(user, post_posts_page):
     return CheckIfLikedInner(user, post_posts_page)
 
 
-
 def index(request):
     questions = Question.objects.New().all().prefetch_related(
                     'author', 'tags', 'likes'
                 )
     page = paginate(questions, request, 5)
+
+    user = request.user
+    if user.is_authenticated:
+        page = CheckIfLiked(user.profile, page)
+    else:
+        page = CheckIfLiked(None, page)
+
     return render(request, 'index.html', {
-        'page': CheckIfLiked(getBaseProfile(), page),
+        'page': page,
         'page_end_diff': page.paginator.num_pages - page.number,
-        'user': getBaseDict(logged_in=True),
+        'user': user,
     })
 
 def question(request, id):
@@ -85,31 +96,81 @@ def question(request, id):
         return render(request, 'question.html', {
             'question': CheckIfLiked(getBaseProfile(), question),
             'page': CheckIfLiked(getBaseProfile(), answer_page),
-            'user': getBaseDict(logged_in=True),
+            'user': request.user,
         })
     except:
         return render(request, '404.html', {
-            'user': getBaseDict(logged_in=True),
+            'user': request.user,
         })
 
 def ask(request):
+    user = getBaseDict(logged_in=False)
+    if not user['logged_in']:
+        return redirect('/login/?continue=/ask/')
+    if request.method == 'POST':
+
+        form = AskForm(request.POST)
+        if form.is_valid():
+            return redirect('/index/')
+    else:
+        form = AskForm()
+
     return render(request, 'ask.html', {
-        'user': getBaseDict(logged_in=True),
+        'user': user,
+        'form': form,
     })
 
 def signup(request):
     return render(request, 'signup.html', {
-        'user': getBaseUser(logged_in=False),
+        'user': request.user,
     })
 
 def login(request):
-    return render(request, 'login.html', {
-        'user': getBaseDict(logged_in=False),
-    })
+    user = request.user
+    next_page = request.POST.get('continue')
+    if user.is_authenticated:
+        return redirect('/index/')
+
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = authenticate(
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password'],
+            )
+            if user is not None:
+                auth_login(request, user)
+
+                if not next_page:
+                    return redirect(index)
+                return redirect(next_page)
+            else:
+                if next_page:
+                    return render(request, 'login.html?continue=' + next_page, {
+                        'user': user,
+                        'form': form,
+                        'error': 'Error during login',
+                    })
+                return render(request, 'login.html', {
+                    'user': user,
+                    'form': form,
+                    'error': 'Error during login',
+                })
+    else:
+        form = LoginForm()
+        if next_page:
+            return render(request, 'login.html?continue=' + next_page, {
+                'user': user,
+                'form': form,
+            })
+        return render(request, 'login.html', {
+            'user': user,
+            'form': form,
+        })
 
 def settings(request):
     return render(request, 'settings.html', {
-        'user': getBaseDict(logged_in=True),
+        'user': request.user,
     })
 
 def tag(request, tag):
@@ -120,7 +181,7 @@ def tag(request, tag):
     return render(request, 'index.html', {
         'page': CheckIfLiked(getBaseProfile(), page),
         'page_end_diff': page.paginator.num_pages - page.number,
-        'user': getBaseDict(logged_in=True),
+        'user': request.user,
     })
 
 def hot(request):
@@ -131,5 +192,5 @@ def hot(request):
     return render(request, 'index.html', {
         'page': CheckIfLiked(getBaseProfile(), page),
         'page_end_diff': page.paginator.num_pages - page.number,
-        'user': getBaseDict(logged_in=True),
+        'user': request.user,
     })

@@ -22,7 +22,7 @@
     {% endblock scripts %}
   </head>
   <body>
-    {% include user.logged_in|yesno:'inc/navbar_logged.html,inc/navbar_unlogged.html' %}
+    {% include 'inc/navbar.html' %}
 
     <main class="container">
       <div class="row">

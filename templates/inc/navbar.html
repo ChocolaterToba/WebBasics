@@ -1,3 +1,5 @@
+{% load static %}
+
 <nav class="navbar navbar-expand-sm navbar-light bg-light">
   <a class="navbar-brand" href="{% url 'index' %}">Ask Aglicheev</a>
   <div class="collapse navbar-collapse">
@@ -6,8 +8,25 @@
       <button class="btn btn-outline-success my-2 mr-2" type="submit">Search</button>
     </form>
     <ul class="navbar-nav list-inline">
-      {% block navbar-user %}
-      {% endblock navbar-user %}
+      {% if user.is_authenticated %}
+        <li>
+          <a class="nav-link p-0" href="#">
+            <img src="{{ user.profile.avatar.url }}" class="avatar-image" alt="avatar image">
+          </a>
+        </li>
+        <li>
+          <ul class="account-info list-unstyled ml-2">
+            <li class="account-name">{{ user.profile.nickname }}</li>
+            <li>
+              <a id="settings-link" href="{% url 'settings' %}">Settings</a>
+              <a id="logout-link" href="{% url 'login' %}">LogOut</a>
+            </li>
+          </ul>
+        </li>
+      {% else %}
+        <li><a class="log-in-link mr-3" href="{% url 'login' %}">Log in</a></li>
+        <li><a class="sign-up-link" href="{% url 'signup' %}">Sign up</a></li>
+      {% endif %}
     </ul>
   </div>
 </nav>

@@ -87,8 +87,9 @@ class Command(BaseCommand):
 
         if users_cnt:
             print('Generating users...')
+            start_users_time = time.time()
             self.fill_profiles(users_cnt)
-            print('Users generated')
+            print('Users generated, time: {}s'.format(time.time() - start_users_time))
 
         base_user, created = User.objects.get_or_create(
             username='basic',
