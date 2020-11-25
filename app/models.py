@@ -9,6 +9,7 @@ class Profile(models.Model):
                                 related_name='profile')
 
     avatar = models.ImageField(upload_to='avatars/',
+                               default='avatars/Toba.jpg',
                                height_field=None, width_field=None,
                                max_length=256, verbose_name='Avatar')
     nickname = models.CharField(max_length = 32, verbose_name='Nickname')
@@ -43,7 +44,7 @@ class Question(models.Model):
     title = models.CharField(max_length=256, verbose_name='Title')
     text = models.TextField(verbose_name='Main text')
     publishing_date = models.DateField(default=date.today, verbose_name='Publishing date')
-    rating = models.IntegerField(verbose_name='Amount of likes', default=0)
+    rating = models.IntegerField( default=0, verbose_name='Amount of likes')
     tags = models.ManyToManyField('Tag', verbose_name='Tags', blank=True,
                                   related_name="questions", related_query_name="question")
     likes = models.ManyToManyField('Profile', through='QuestionLike', blank=True,
