@@ -16,3 +16,11 @@ hr {
 .answer-block {
     border: 0.1rem solid black;
 }
+
+.answer-correct {
+    border: 0.2rem solid lightgreen;
+}
+
+.correct-answer-marker {
+    color: darkgreen;
+}

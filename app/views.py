@@ -57,8 +57,8 @@ def CheckIfLikedInner(user: User, post: Union[Question, Answer]):
         result['answers_amount'] = post.answers.count()
 
     # Adding whether or not user liked/disliked that post.
-    if user is not None:
-        result['liked_or_disliked'] = post.LikedOrDislikedBy(user)
+    if user.is_authenticated:
+        result['liked_or_disliked'] = post.LikedOrDislikedBy(user.profile)
     return result
 
 def CheckIfLiked(user, post_posts_page):
@@ -78,60 +78,104 @@ def index(request):
     page = paginate(questions, request, 5)
 
     user = request.user
-    if user.is_authenticated:
-        page = CheckIfLiked(user.profile, page)
-    else:
-        page = CheckIfLiked(None, page)
 
     return render(request, 'index.html', {
-        'page': page,
+        'page': CheckIfLiked(user, page),
         'page_end_diff': page.paginator.num_pages - page.number,
         'user': user,
-    })
+        }
+    )
 
-def question(request, id):
+def question(request, question_id):
     try:
-        question = Question.objects.get(id=id)
+        question = Question.objects.get(id=question_id)
         answers = question.answers.Best().all().prefetch_related('likes')
         answer_page = paginate(answers, request, 5)
-        return render(request, 'question.html', {
-            'question': CheckIfLiked(getBaseProfile(), question),
-            'page': CheckIfLiked(getBaseProfile(), answer_page),
+
+        if not request.user.is_authenticated:
+            return render(request, 'question.html', {
+            'question': CheckIfLiked(request.user, question),
+            'page': CheckIfLiked(request.user, answer_page),
             'user': request.user,
-        })
+            'form': AnswerForm(),
+            }
+        )
+
+        if request.method == 'POST':
+            form = AnswerForm(request.POST)
+            if form.is_valid():
+                Answer.objects.create(
+                    author_id=request.user.profile.id,
+                    related_question_id = question_id,
+                    text=form.cleaned_data['text']
+                )
+                return redirect('question', question_id=question_id)  # TODO: add answer's id
+
+            return render(request, 'question.html', {
+                'question': CheckIfLiked(request.user, question),
+                'page': CheckIfLiked(request.user, answer_page),
+                'user': request.user,
+                'form': form,
+                'error': 'Wrong answer input',  # TODO.
+                }
+            )
+
+        else:
+            return render(request, 'question.html', {
+                'question': CheckIfLiked(request.user, question),
+                'page': CheckIfLiked(request.user, answer_page),
+                'user': request.user,
+                'form': AnswerForm(),
+                }
+            )
     except:
         return render(request, '404.html', {
             'user': request.user,
-        })
+            }
+        )
 
 def ask(request):
-    if request.user.is_authenticated:
-        if request.method == 'POST':
+    if not request.user.is_authenticated:
+        response = redirect('login')
+        response['Location'] += '?continue=/ask/'
+        return response
 
-            form = AskForm(request.POST)
-            if form.is_valid():
-                return redirect('/index/')
-        else:
-            form = AskForm()
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            question = Question(
+                author_id=request.user.profile.id,
+                title=form.cleaned_data['title'],
+                text=form.cleaned_data['text'],
+            )
+            question.save()
+            question.tags.set(form.cleaned_data['tags'])
+            return redirect('question', id=question.id)
 
-            return render(request, 'ask.html', {
-                'user': request.user,
-                'form': form,
-            })
+        return render(request, 'ask.html', {
+            'user': request.user,
+            'form': form,
+            'error': 'Wrong question input',  # TODO.
+            }
+        )
 
-    response = redirect('login')
-    response['Location'] += '?continue=/ask/'
-    return response
+    else:
+        return render(request, 'ask.html', {
+            'user': request.user,
+            'form': QuestionForm(),
+            }
+        )
 
 def signup(request):
     return render(request, 'signup.html', {
         'user': request.user,
-    })
+        }
+    )
 
 def login(request):
     next_page = request.GET.get('continue', default='/index/')
 
-    if  request.user.is_authenticated:
+    if request.user.is_authenticated:
         return redirect(next_page)
 
     if request.method == 'POST':
@@ -144,20 +188,21 @@ def login(request):
             if user is not None:
                 auth_login(request, user)
                 return redirect(next_page)
-
-            else:
-                return render(request, 'login.html', {
-                    'user': request.user,
-                    'form': form,
-                    'error': 'Error during login',
-                })
+        
+        return render(request, 'login.html', {
+            'user': request.user,
+            'form': form,
+            'error': 'Error during login',  # TODO.
+            }
+        )
 
     else:
         form = LoginForm()
         return render(request, 'login.html', {
             'user': request.user,
             'form': form,
-        })
+            }
+        )
 
 def logout(request):
     next_page = request.GET.get('continue', default='/index/')
@@ -167,7 +212,8 @@ def logout(request):
 def settings(request):
     return render(request, 'settings.html', {
         'user': request.user,
-    })
+        }
+    )
 
 def tag(request, tag):
     questions = Question.objects.HotWithTag(tag).all().prefetch_related(
@@ -178,7 +224,8 @@ def tag(request, tag):
         'page': CheckIfLiked(getBaseProfile(), page),
         'page_end_diff': page.paginator.num_pages - page.number,
         'user': request.user,
-    })
+        }
+    )
 
 def hot(request):
     questions = Question.objects.Hot().all().prefetch_related(
@@ -189,4 +236,5 @@ def hot(request):
         'page': CheckIfLiked(getBaseProfile(), page),
         'page_end_diff': page.paginator.num_pages - page.number,
         'user': request.user,
-    })
+        }
+    )

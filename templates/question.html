@@ -26,13 +26,25 @@
       <hr>
     </li>
   {% endif %}
-  <li class="mb-3">
-    <form>
+  <li class="mb-4">
+    <form method="POST">
+      {% csrf_token %}
+
+      {% if error %}
+        <li>
+          <p class="warning">{{ error }}</p>
+        </li>
+      {% endif %}
+
       <div class="form-group">
-        <textarea class="answer-block form-control" id="question-text" rows="4"
-          placeholder="Enter your answer here..." aria-label="Enter your answer here"></textarea>
+        <label for="{{ form.text.id_for_label }}" class="col-form-label sr-only">Your new answer</label>
+        {{ form.text }}
       </div>
-      <button type="submit" class="answer-block btn btn-outline-dark">Answer</button>
+      {% if user.is_authenticated %}
+        <button type="submit" class="answer-block btn btn-outline-dark">Submit Answer</button>
+      {% else %}
+        <button type="submit" class="answer-block btn btn-outline-dark" disabled>Log In To Answer</button>
+      {% endif %}
     </form>
   </li>
   {% include 'inc/bottom_navbar.html' %}

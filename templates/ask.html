@@ -16,18 +16,20 @@
     <h3 class="pr-2">New Question</h3>
   </li>
   <li>
-    <form>
+    <form method="POST">
+      {% csrf_token %}
+
       <div class="form-row mb-2">
-        <label for="title" class="col-form-label col-sm-3 col-md-2 mr-1">Title</label>
-        <input type="text" class="right-col form-control col-sm-8 col-md-9" id="title" placeholder="Title">
+        <label for="{{ form.title.id_for_label }}" class="col-form-label col-sm-3 col-md-2 mr-1">Title</label>
+        {{ form.title }}
       </div>
       <div class="form-row mb-2">
-        <label for="question-text" class="col-form-label col-sm-3 col-md-2 mr-1">Text</label>
-        <textarea class="right-col form-control col-sm-8 col-md-9" id="question-text" rows="10" placeholder="Text"></textarea>
+        <label for="{{ form.text.id_for_label }}" class="col-form-label col-sm-3 col-md-2 mr-1">Text</label>
+        {{ form.text }}
       </div>
       <div class="form-row mb-3">
-        <label for="question-tags" class="col-form-label col-sm-3 col-md-2 mr-1">Tags</label>
-        <input type="text" class="right-col form-control col-sm-8 col-md-9" id="question-tags" placeholder="Tags">
+        <label for="{{ form.tags.id_for_label }}" class="col-form-label col-sm-3 col-md-2 mr-1">Tags</label>
+        {{ form.tags }}
       </div>
       <div class="form-row">
         <div class="col-sm-3 col-md-2 mr-1"></div>
