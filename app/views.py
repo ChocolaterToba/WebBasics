@@ -105,21 +105,23 @@ def question(request, id):
         })
 
 def ask(request):
-    user = getBaseDict(logged_in=False)
-    if not user['logged_in']:
-        return redirect('/login/?continue=/ask/')
-    if request.method == 'POST':
+    if request.user.is_authenticated:
+        if request.method == 'POST':
 
-        form = AskForm(request.POST)
-        if form.is_valid():
-            return redirect('/index/')
-    else:
-        form = AskForm()
+            form = AskForm(request.POST)
+            if form.is_valid():
+                return redirect('/index/')
+        else:
+            form = AskForm()
 
-    return render(request, 'ask.html', {
-        'user': user,
-        'form': form,
-    })
+            return render(request, 'ask.html', {
+                'user': request.user,
+                'form': form,
+            })
+
+    response = redirect('login')
+    response['Location'] += '?continue=/ask/'
+    return response
 
 def signup(request):
     return render(request, 'signup.html', {
@@ -127,15 +129,9 @@ def signup(request):
     })
 
 def login(request):
-    user = request.user
-    if request.method == "POST":
-        next_page = request.POST.get('continue', default='/index/')
-    elif request.method == "GET":
-        next_page = request.GET.get('continue', default='/index/')
-    else:
-        next_page = '/index/'
+    next_page = request.GET.get('continue', default='/index/')
 
-    if user.is_authenticated:
+    if  request.user.is_authenticated:
         return redirect(next_page)
 
     if request.method == 'POST':
@@ -151,7 +147,7 @@ def login(request):
 
             else:
                 return render(request, 'login.html', {
-                    'user': user,
+                    'user': request.user,
                     'form': form,
                     'error': 'Error during login',
                 })
@@ -159,7 +155,7 @@ def login(request):
     else:
         form = LoginForm()
         return render(request, 'login.html', {
-            'user': user,
+            'user': request.user,
             'form': form,
         })
 
@@ -193,5 +189,3 @@ def hot(request):
         'page_end_diff': page.paginator.num_pages - page.number,
         'user': request.user,
     })
-
-

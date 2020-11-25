@@ -24,8 +24,8 @@
           </ul>
         </li>
       {% else %}
-        <li><a class="log-in-link mr-3" href="{% url 'login' %}?continue={{ request.url }}">Log in</a></li>
-        <li><a class="sign-up-link" href="{% url 'signup' %}?continue={{ request.url }}">Sign up</a></li>
+        <li><a class="log-in-link mr-3" href="{% url 'login' %}?continue={{ request.path }}">Log in</a></li>
+        <li><a class="sign-up-link" href="{% url 'signup' %}?continue={{ request.path }}">Sign up</a></li>
       {% endif %}
     </ul>
   </div>
