@@ -21,14 +21,15 @@
     </li>
   {% endif %}
   <li class="mb-3">
-    <form>
+    <form action="{{ request.get_full_path }}" method="POST">
+      {% csrf_token %}
       <div class="form-row mb-2">
-        <label for="login" class="col-form-label col-sm-3 col-md-2 mr-1">Login</label>
-        <input type="text" class="right-col form-control col-sm-6" id="login" placeholder="Enter your login here">
+        <label for="{{ form.username.id_for_label }}" class="col-form-label col-sm-3 col-md-2 mr-1">Username</label>
+        {{ form.username }}
       </div>
       <div class="form-row mb-3">
-        <label for="password" class="col-form-label col-sm-3 col-md-2 mr-1">Password</label>
-        <input type="password" class="right-col form-control col-sm-6" id="password" placeholder="********">
+        <label for="{{ form.password.id_for_label }}" class="col-form-label col-sm-3 col-md-2 mr-1">Password</label>
+        {{ form.password }}
       </div>
       <div class="form-row">
         <div class="col-sm-3 col-md-2 mr-1"></div>
@@ -40,10 +41,5 @@
     <div class="col-sm-3 col-md-2 mr-2"></div>
     <a href="{% url 'signup' %}">Create new account</a>
   </li>
-  <form action="{{ request.get_full_path }}" method="POST">
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit">
-  </form>
 </ul>
 {% endblock content %}
