@@ -38,14 +38,21 @@
         </li>
       {% endif %}
 
-      <div class="form-group">
-        <label for="{{ form.text.id_for_label }}" class="col-form-label sr-only">Your new answer</label>
-        {{ form.text }}
-      </div>
       {% if user.is_authenticated %}
+        <div class="form-group">
+          <label for="{{ form.text.id_for_label }}" class="col-form-label sr-only">Your new answer</label>
+          {{ form.text }}
+        </div>
         <button type="submit" class="answer-block btn btn-outline-dark">Submit Answer</button>
+
       {% else %}
-        <button type="submit" class="answer-block btn btn-outline-dark" disabled>Log In To Answer</button>
+        <div class="form-group">
+          <textarea class="answer-block form-control" id="{{ form.text.id_for_label }}" rows="4"
+           placeholder="Login to answer..." aria-label="Enter your answer here" disabled></textarea>
+        </div>
+        <a href="{% url 'login' %}?continue={{ request.path }}" class="answer-block btn btn-outline-dark">
+          Log In To Answer
+        </a>
       {% endif %}
     </form>
   </li>
