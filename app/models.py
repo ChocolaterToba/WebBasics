@@ -1,6 +1,9 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 from datetime import datetime, date
 
 class Profile(models.Model):
@@ -12,7 +15,8 @@ class Profile(models.Model):
                                default='avatars/Toba.jpg',
                                height_field=None, width_field=None,
                                max_length=256, verbose_name='Avatar')
-    nickname = models.CharField(max_length = 32, verbose_name='Nickname')
+    nickname = models.CharField(max_length = 32, verbose_name='Nickname',
+                                default="Default Nickname")
 
     def __str__(self):
         return self.nickname
@@ -21,6 +25,12 @@ class Profile(models.Model):
         verbose_name = 'Profile'
         verbose_name_plural = 'Profiles'
         ordering = ['id']
+
+@receiver(post_save, sender=User)
+def update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user_id=instance.id)
+    instance.profile.save()
 
 class QuestionManager(models.Manager):
     def SearchByTag(self, tag):

@@ -1,5 +1,5 @@
-function getFile() {
-    document.getElementById("avatarFile").click();
+function getFile(id) {
+    document.getElementById(id).click();
 }
   
 function sub(obj) {

@@ -1,11 +1,13 @@
 from django import forms
 from app.models import Question, Answer, Tag
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=150, 
         widget=forms.TextInput(attrs={
             'class': 'right-col form-control col-sm-6',
-            'placeholder': 'Enter your Username here',
+            'placeholder': 'Enter your login here',
             }
         )
     )
@@ -16,6 +18,54 @@ class LoginForm(forms.Form):
             }
         )
     )
+
+class SignUpForm(UserCreationForm):
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'right-col form-control col-sm-6',
+            'placeholder': '********',
+            }
+        )
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'right-col form-control col-sm-6',
+            'placeholder': '********',
+            }
+        )
+    )
+
+    avatar = forms.ImageField(required=False,
+        widget=forms.ClearableFileInput(attrs={
+            'class': 'right-col form-control col-sm-6',
+            'onchange': 'sub(this)',
+            }
+        )
+    )
+
+    nickname = forms.CharField(max_length=30,
+        widget=forms.TextInput(attrs={
+            'class': 'right-col form-control col-sm-6',
+            'placeholder': 'Example Nick',
+            }
+        )
+    )
+
+    class Meta:
+        model = User
+        fields = ('username', 'email')
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'class': 'right-col form-control col-sm-6',
+                'placeholder': 'Example Login',
+                }
+            ),
+            'email': forms.EmailInput(attrs={
+                'class': 'right-col form-control col-sm-6',
+                'placeholder': 'Example@email.com',
+                }
+            ),
+        }
 
 class QuestionForm(forms.ModelForm):
     tags = forms.ModelMultipleChoiceField(

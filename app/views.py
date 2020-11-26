@@ -167,8 +167,26 @@ def ask(request):
         )
 
 def signup(request):
+    next_page = request.GET.get('continue', default='/index/')
+    
+    if request.method == 'POST':
+        form = SignUpForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = form.save()
+            user.refresh_from_db()  # load the profile instance created by the signal
+            if form.cleaned_data['avatar'] is not None:
+                user.profile.avatar = form.cleaned_data['avatar']
+            user.profile.nickname = form.cleaned_data['nickname']
+            user.save()
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=user.username, password=raw_password)
+            auth_login(request, user)
+            return redirect(next_page)
+    else:
+        form = SignUpForm()
     return render(request, 'signup.html', {
         'user': request.user,
+        'form': form,
         }
     )
 
