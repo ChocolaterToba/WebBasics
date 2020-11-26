@@ -174,21 +174,32 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             user.refresh_from_db()  # load the profile instance created by the signal
-            if form.cleaned_data['avatar'] is not None:
+
+            if form.cleaned_data['avatar'] is not None: # Else avatar is Toba's photo.
                 user.profile.avatar = form.cleaned_data['avatar']
+
             user.profile.nickname = form.cleaned_data['nickname']
             user.save()
+
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=user.username, password=raw_password)
             auth_login(request, user)
             return redirect(next_page)
+        
+        return render(request, 'signup.html', {
+            'user': request.user,
+            'form': form,
+            'error': 'Wrong signup input',  # TODO.
+            }
+        )
     else:
-        form = SignUpForm()
-    return render(request, 'signup.html', {
-        'user': request.user,
-        'form': form,
-        }
-    )
+        return render(request, 'signup.html', {
+            'user': request.user,
+            'form': SignUpForm(),
+            }
+        )
+
+    
 
 def login(request):
     next_page = request.GET.get('continue', default='/index/')
