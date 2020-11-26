@@ -18,9 +18,11 @@
     <h3 class="mr-2">New Questions</h3>
     <a href="{% url 'hot' %}">Hot Questions</a>
   </li>
+
   {% for question in page %}
     {% include 'inc/one_question.html' %}
   {% endfor %}
+
   {% include 'inc/bottom_navbar.html' %}
 </ul>
 {% endblock content %}

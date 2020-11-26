@@ -18,6 +18,7 @@
   <li>
     <hr id="answersStart">
   </li>
+
   {% if page %}
     {% for answer in page %}
       {% include 'inc/one_answer.html' %}
@@ -26,6 +27,7 @@
       <hr>
     </li>
   {% endif %}
+
   <li class="mb-4">
     <form method="POST">
       {% csrf_token %}
