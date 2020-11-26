@@ -8,7 +8,7 @@
     max-width: 7rem;
 }
 
-#fileButton {  
+.file-button {  
     cursor: pointer;
     overflow: hidden;
 }

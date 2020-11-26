@@ -37,8 +37,9 @@ class SignUpForm(UserCreationForm):
 
     avatar = forms.ImageField(required=False,
         widget=forms.ClearableFileInput(attrs={
+            'id': 'avatar_id',
             'class': 'right-col form-control col-sm-6',
-            'onchange': 'sub(this)',
+            'onchange': "sub(this, 'file_button_{}')".format('avatar_id'),
             }
         )
     )

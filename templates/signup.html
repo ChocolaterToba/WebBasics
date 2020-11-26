@@ -53,12 +53,13 @@
 
       <div class="form-row mb-3">
         <label for="{{ form.avatar.id_for_label }}"
-         class="custom-file-upload col-form-label col-sm-3 col-md-2 mr-1 mt-auto">Upload avatar</label>
+         class="custom-file-upload col-form-label col-sm-3 col-md-2 mr-1 my-auto">Upload avatar</label>
 
         <div class="custom-image-file mr-2 col-sm-6 px-0">
           <img src="{% static 'img/Toba.jpg' %}" class="file-image-preview mb-2"
            id="newAvatarImage" alt="new avatar image">
-          <div id="fileButton" class="right-col form-control" onclick="getFile('{{ form.avatar.id_for_label }}')">Click to upload an avatar</div>
+          <div id="file_button_{{ form.avatar.id_for_label }}" class="file-button right-col form-control"
+           onclick="getFile('{{ form.avatar.id_for_label }}')">Click to upload an avatar</div>
           {{ form.avatar }}
         </div>
       </div>
