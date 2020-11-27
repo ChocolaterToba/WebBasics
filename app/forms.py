@@ -68,6 +68,57 @@ class SignUpForm(UserCreationForm):
             ),
         }
 
+class SettingsForm(forms.Form):
+    username = forms.CharField(required=False, max_length=150, 
+        widget=forms.TextInput(attrs={
+            'class': 'right-col form-control col-sm-6',
+            }
+        )
+    )
+
+    email = forms.EmailField(required=False,
+        widget=forms.EmailInput(attrs={
+            'class': 'right-col form-control col-sm-6',
+            }
+        )
+    )
+
+    nickname = forms.CharField(required=False, max_length=30,
+        widget=forms.TextInput(attrs={
+            'class': 'right-col form-control col-sm-6',
+            }
+        )
+    )
+
+    avatar = forms.ImageField(required=False,
+        widget=forms.ClearableFileInput(attrs={
+            'id': 'avatar_id',
+            'class': 'right-col form-control col-sm-6',
+            'onchange': "sub(this, 'file_button_{}')".format('avatar_id'),
+            }
+        )
+    )
+
+    def __init__(self, *args, **kwargs):
+        if 'user' in kwargs:
+            user = kwargs.pop('user')
+            super(SettingsForm, self).__init__(*args, **kwargs)
+            self.fields['username'].widget.attrs['placeholder'] = user.username
+            self.fields['email'].widget.attrs['placeholder'] = user.email
+            self.fields['nickname'].widget.attrs['placeholder'] = user.profile.nickname
+
+        else:
+            super(SettingsForm, self).__init__(*args, **kwargs)
+    
+    def clean(self):
+        cleaned_data = super(SettingsForm, self).clean()
+
+        username = cleaned_data.get('username')
+        if User.objects.filter(username=username).exists():
+            self.add_error('username', 'This username is already taken.')
+
+        return cleaned_data
+
 class QuestionForm(forms.ModelForm):
     tags = forms.ModelMultipleChoiceField(
                 queryset=Tag.objects.all(),

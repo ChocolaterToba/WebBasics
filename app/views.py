@@ -239,10 +239,50 @@ def logout(request):
     return redirect(next_page)
 
 def settings(request):
-    return render(request, 'settings.html', {
-        'user': request.user,
-        }
-    )
+    if not request.user.is_authenticated:
+        response = redirect('login')
+        response['Location'] += '?continue=/settings/'
+        return response
+
+    user = request.user
+    initial_form_data = {
+        'username': user.username,
+        'email': user.email,
+        'nickname': user.profile.nickname,
+        'avatar': user.profile.avatar,
+    }
+
+    if request.method == 'POST':
+        form = SettingsForm(request.POST, request.FILES,
+                            user=user, initial=initial_form_data)
+        if form.is_valid():
+            if 'username' in form.changed_data:
+                user.username = form.cleaned_data['username']
+            if 'email' in form.changed_data:
+                user.email = form.cleaned_data['email']
+            if 'nickname' in form.changed_data:
+                user.profile.nickname = form.cleaned_data['nickname']
+            if 'avatar' in form.changed_data:
+                user.profile.avatar = form.cleaned_data['avatar']
+            user.save()
+            return render(request, 'settings.html', {
+                'user': user,
+                'form': form,
+                }
+            )
+
+        return render(request, 'settings.html', {
+            'user': user,
+            'form': form,
+            'error': 'Wrong settings input',  # TODO.
+            }
+        )
+    else:
+        return render(request, 'settings.html', {
+            'user': user,
+            'form': SettingsForm(user=user),
+            }
+        )
 
 def tag(request, tag):
     questions = Question.objects.HotWithTag(tag).all().prefetch_related(

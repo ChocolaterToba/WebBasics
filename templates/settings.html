@@ -20,7 +20,7 @@
     <h3 class="mr-2">Settings: {{ user.username }}</h3>
   </li>
   <li class="mb-3">
-    <form enctype="multipart/form-data">
+    <!-- <form enctype="multipart/form-data">
       <div class="form-row mb-2">
         <label for="login" class="col-form-label col-sm-3 col-md-2 mr-1">Login</label>
         <input type="text" class="right-col form-control col-sm-6" id="login" placeholder={{ user.login }}>
@@ -52,6 +52,42 @@
       <div class="form-row">
         <div class="col-sm-3 col-md-2 mr-1"></div>
         <button type="submit" class="right-col btn btn-outline-dark">Save!</button>
+      </div>
+    </form> -->
+    <form enctype="multipart/form-data" method="POST">
+      {% csrf_token %}
+
+      <div class="form-row mb-2">
+        <label for="{{ form.username.id_for_label }}" class="col-form-label col-sm-3 col-md-2 mr-1">Login</label>
+        {{ form.username }}
+      </div>
+
+      <div class="form-row mb-2">
+        <label for="{{ form.email.id_for_label }}" class="col-form-label col-sm-3 col-md-2 mr-1">Email</label>
+        {{ form.email }}
+      </div>
+
+      <div class="form-row mb-2">
+        <label for="{{ form.nickname.id_for_label }}" class="col-form-label col-sm-3 col-md-2 mr-1">Nickname</label>
+        {{ form.nickname }}
+      </div>
+
+      <div class="form-row mb-3">
+        <label for="{{ form.avatar.id_for_label }}"
+         class="custom-file-upload col-form-label col-sm-3 col-md-2 mr-1 my-auto">Change avatar</label>
+
+        <div class="custom-image-file mr-2 col-sm-6 px-0">
+          <img src="{{ user.profile.avatar.url }}" class="file-image-preview rounded mb-2"
+           id="newAvatarImage" alt="new avatar image">
+          <div id="file_button_{{ form.avatar.id_for_label }}" class="file-button right-col form-control"
+           onclick="getFile('{{ form.avatar.id_for_label }}')">Click to upload a new avatar</div>
+          {{ form.avatar }}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="col-sm-3 col-md-2 mr-1"></div>
+        <button type="submit" class="right-col btn btn-outline-dark">Register!</button>
       </div>
     </form>
   </li>

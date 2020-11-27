@@ -2,6 +2,9 @@
     border: 0.1rem solid black;
 }
 
+.warning {
+    color: red;
+}
 
 .file-image-preview {
     height: 5rem;
@@ -11,4 +14,8 @@
 .file-button {  
     cursor: pointer;
     overflow: hidden;
+}
+
+.custom-image-file > input {
+    display: none;
 }
