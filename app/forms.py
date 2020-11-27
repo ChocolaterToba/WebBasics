@@ -3,8 +3,10 @@ from app.models import Question, Answer, Tag
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
+
 class LoginForm(forms.Form):
-    username = forms.CharField(max_length=150, 
+    username = forms.CharField(
+        max_length=150,
         widget=forms.TextInput(attrs={
             'class': 'right-col form-control col-sm-6',
             'placeholder': 'Enter your login here',
@@ -18,6 +20,7 @@ class LoginForm(forms.Form):
             }
         )
     )
+
 
 class SignUpForm(UserCreationForm):
     password1 = forms.CharField(
@@ -35,7 +38,8 @@ class SignUpForm(UserCreationForm):
         )
     )
 
-    avatar = forms.ImageField(required=False,
+    avatar = forms.ImageField(
+        required=False,
         widget=forms.ClearableFileInput(attrs={
             'id': 'avatar_id',
             'class': 'right-col form-control col-sm-6',
@@ -44,7 +48,8 @@ class SignUpForm(UserCreationForm):
         )
     )
 
-    nickname = forms.CharField(max_length=30,
+    nickname = forms.CharField(
+        max_length=30,
         widget=forms.TextInput(attrs={
             'class': 'right-col form-control col-sm-6',
             'placeholder': 'Example Nick',
@@ -68,29 +73,34 @@ class SignUpForm(UserCreationForm):
             ),
         }
 
+
 class SettingsForm(forms.Form):
-    username = forms.CharField(required=False, max_length=150, 
+    username = forms.CharField(
+        required=False, max_length=150,
         widget=forms.TextInput(attrs={
             'class': 'right-col form-control col-sm-6',
             }
         )
     )
 
-    email = forms.EmailField(required=False,
+    email = forms.EmailField(
+        required=False,
         widget=forms.EmailInput(attrs={
             'class': 'right-col form-control col-sm-6',
             }
         )
     )
 
-    nickname = forms.CharField(required=False, max_length=30,
+    nickname = forms.CharField(
+        required=False, max_length=30,
         widget=forms.TextInput(attrs={
             'class': 'right-col form-control col-sm-6',
             }
         )
     )
 
-    avatar = forms.ImageField(required=False,
+    avatar = forms.ImageField(
+        required=False,
         widget=forms.ClearableFileInput(attrs={
             'id': 'avatar_id',
             'class': 'right-col form-control col-sm-6',
@@ -105,11 +115,12 @@ class SettingsForm(forms.Form):
             super(SettingsForm, self).__init__(*args, **kwargs)
             self.fields['username'].widget.attrs['placeholder'] = user.username
             self.fields['email'].widget.attrs['placeholder'] = user.email
-            self.fields['nickname'].widget.attrs['placeholder'] = user.profile.nickname
+            self.fields['nickname'].widget.attrs['placeholder'] = \
+                user.profile.nickname
 
         else:
             super(SettingsForm, self).__init__(*args, **kwargs)
-    
+
     def clean(self):
         cleaned_data = super(SettingsForm, self).clean()
 
@@ -118,6 +129,7 @@ class SettingsForm(forms.Form):
             self.add_error('username', 'This username is already taken.')
 
         return cleaned_data
+
 
 class QuestionForm(forms.ModelForm):
     tags = forms.ModelMultipleChoiceField(
@@ -146,6 +158,7 @@ class QuestionForm(forms.ModelForm):
             ),
         }
 
+
 class AnswerForm(forms.ModelForm):
     class Meta:
         model = Answer
@@ -158,4 +171,3 @@ class AnswerForm(forms.ModelForm):
                 }
             ),
         }
-        
