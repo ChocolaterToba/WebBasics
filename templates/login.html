@@ -16,15 +16,16 @@
     <h3 class="mr-2">Log In</h3>
   </li>
 
-  {% if error %}
-    <li>
-      <p class="warning">{{ error }}</p>
-    </li>
-  {% endif %}
-
   <li class="mb-3">
     <form action="{{ request.get_full_path }}" method="POST">
       {% csrf_token %}
+
+      {% if error %}
+        <div class="error form-row mb-2">
+          <div class="col-sm-3 col-md-2 mr-1"></div>
+          {{ error }}
+        </div>
+      {% endif %}
 
       <div class="form-row mb-2">
         <label for="{{ form.username.id_for_label }}" class="col-form-label col-sm-3 col-md-2 mr-1">Login</label>
