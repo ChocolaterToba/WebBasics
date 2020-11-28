@@ -147,18 +147,22 @@ class SettingsForm(forms.Form):
 
 
 class QuestionForm(forms.ModelForm):
-    tags = forms.ModelMultipleChoiceField(
-        queryset=Tag.objects.all(),
-        to_field_name="name",
+    tags = forms.CharField(
+        required=False, max_length=200,
+        label='Tags (10 max)',
+        widget=forms.TextInput(attrs={
+            'class': 'right-col form-control',
+            'placeholder': 'Enter your tags, separated by whitespace',
+            }
+        )
     )
 
     class Meta:
         model = Question
-        fields = ['title', 'text', 'tags']
+        fields = ['title', 'text']
         labels = {
             'title': 'Title',
             'text': 'Text',
-            'tags': 'Tags',
         }
         widgets = {
             'title': forms.TextInput(attrs={
@@ -172,11 +176,14 @@ class QuestionForm(forms.ModelForm):
                 'rows': '10',
                 }
             ),
-            'tags': forms.SelectMultiple(attrs={
-                'class': 'right-col form-control',
-                }
-            ),
         }
+    
+    def clean(self):
+        cleaned_data = super(QuestionForm, self).clean()
+
+        if len(cleaned_data.get('tags').split(' ')) > 10:
+            self.add_error('tags', 'Cannot add more than 10 tags.')
+        return cleaned_data
 
 
 class AnswerForm(forms.ModelForm):

@@ -6,6 +6,7 @@ from django.core.paginator import Paginator, Page
 
 from django.forms.models import model_to_dict
 from django.db.models.query import QuerySet
+from django.db import transaction
 
 from app.models import Profile, Question, Answer
 from django.contrib.auth.models import User
@@ -94,7 +95,6 @@ def question(request, question_id):
                 'page': CheckIfLikedPage(request.user, answers_page),
                 'user': request.user,
                 'form': form,
-                'error': 'Wrong answer input',  # TODO.
                 }
             )
 
@@ -127,14 +127,20 @@ def ask(request):
                 title=form.cleaned_data['title'],
                 text=form.cleaned_data['text'],
             )
+
+            tags = list(set(form.cleaned_data['tags'].split(' ')))
+            with transaction.atomic():
+                for tag in tags:
+                    if not Tag.objects.filter(name=tag).exists():
+                        Tag.objects.create(name=tag)
+
             question.save()
-            question.tags.set(form.cleaned_data['tags'])
-            return redirect('question', id=question.id)
+            question.tags.set(tags)
+            return redirect('question', question_id=question.id)
 
         return render(request, 'ask.html', {
             'user': request.user,
             'form': form,
-            'error': 'Wrong question input',  # TODO.
             }
         )
 
@@ -169,7 +175,6 @@ def signup(request):
             user = authenticate(username=user.username, password=raw_password)
             auth_login(request, user)
             return redirect(next_page)
-        print(form)
 
         return render(request, 'signup.html', {
             'user': request.user,
@@ -208,7 +213,6 @@ def login(request):
         return render(request, 'login.html', {
             'user': request.user,
             'form': form,
-            'error': 'Error during login',  # TODO.
             }
         )
 
@@ -264,7 +268,6 @@ def settings(request):
         return render(request, 'settings.html', {
             'user': user,
             'form': form,
-            'error': 'Wrong settings input',  # TODO.
             }
         )
     else:
