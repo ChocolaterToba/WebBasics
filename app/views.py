@@ -79,12 +79,15 @@ def question(request, question_id):
         if request.method == 'POST':
             form = AnswerForm(request.POST)
             if form.is_valid():
-                Answer.objects.create(
+                answer = Answer.objects.create(
                     author_id=request.user.profile.id,
                     related_question_id=question_id,
                     text=form.cleaned_data['text']
                 )
-                return redirect('question', question_id=question_id)  # TODO: add answer's id
+
+                response = redirect('question', question_id=question_id)
+                response['Location'] += '#answer{}'.format(answer.id)
+                return response
 
             return render(request, 'question.html', {
                 'question': CheckIfLikedPost(request.user, question),

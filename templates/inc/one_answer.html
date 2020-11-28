@@ -1,9 +1,9 @@
 {% load static %}
 
 {% if answer.is_correct %}
-  <li class="answer-block answer-correct d-flex rounded pl-2 pt-1 pb-2 mb-3">
+  <li class="answer-block answer-correct d-flex rounded pl-2 pt-1 pb-2 mb-3" id="answer{{ answer.id }}">
 {% else %}
-  <li class="answer-block d-flex rounded pl-2 pt-1 pb-2 mb-3">
+  <li class="answer-block d-flex rounded pl-2 pt-1 pb-2 mb-3" id="answer{{ answer.id }}">
 {% endif %}
   {% include 'inc/answer_likesbox.html' %}
     <div class="answer-body flex-grow-1 d-flex flex-column ml-3">
