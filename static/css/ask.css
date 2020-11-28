@@ -1,3 +1,7 @@
 .right-col {
     border: 0.1rem solid black;
 }
+
+.error {
+    color: red;
+}

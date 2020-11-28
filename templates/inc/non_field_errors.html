@@ -1,0 +1,12 @@
+{% if form.non_field_errors %}
+  <div class="form-row mb-2">
+    <div class="col-sm-3 col-md-2 mr-1"></div>
+    <ul class="list-unstyled">
+      {% for error in form.non_field_errors %}
+        <li class="error">
+          {{ error }}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}

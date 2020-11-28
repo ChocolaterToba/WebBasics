@@ -166,11 +166,11 @@ def signup(request):
             user = authenticate(username=user.username, password=raw_password)
             auth_login(request, user)
             return redirect(next_page)
+        print(form)
 
         return render(request, 'signup.html', {
             'user': request.user,
             'form': form,
-            'error': 'Wrong signup input',  # TODO.
             }
         )
     else:
@@ -197,6 +197,10 @@ def login(request):
             if user is not None:
                 auth_login(request, user)
                 return redirect(next_page)
+            else:
+                form.add_error(None, 'Incorrect login or password')
+        
+        print(form.errors)
 
         return render(request, 'login.html', {
             'user': request.user,

@@ -32,21 +32,30 @@
     <form method="POST">
       {% csrf_token %}
 
-      {% if error %}
-        <li>
-          <p class="warning">{{ error }}</p>
-        </li>
-      {% endif %}
+      {% include 'inc/non_field_errors.html' %}
 
       {% if user.is_authenticated %}
         <div class="form-group">
-          <label for="{{ form.text.id_for_label }}" class="col-form-label sr-only">Your new answer</label>
-          {{ form.text }}
+          <label for="{{ form.text.id_for_label }}" class="sr-only">Your new answer</label>
+          <div>
+            {% if field.errors %}
+              <ul class="list-unstyled">
+                {% for error in form.non_field_errors %}
+                  <li>
+                    {{ error }}
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+
+            {{ form.text }}
+          </div>
         </div>
         <button type="submit" class="answer-block btn btn-outline-dark">Submit Answer</button>
 
       {% else %}
         <div class="form-group">
+          <label for="{{ form.text.id_for_label }}" class="sr-only">You need to login to be able to answer</label>
           <textarea class="answer-block form-control" id="{{ form.text.id_for_label }}" rows="4"
            placeholder="Login to answer..." aria-label="Enter your answer here" disabled></textarea>
         </div>

@@ -19,19 +19,30 @@
     <form method="POST">
       {% csrf_token %}
 
+      {% include 'inc/non_field_errors.html' %}
+
       <div class="form-row mb-2">
         <label for="{{ form.title.id_for_label }}" class="col-form-label col-sm-3 col-md-2 mr-1">Title</label>
-        {{ form.title }}
+        <div class="col-sm-6 px-0 col-sm-8 col-md-9">
+          {{ form.title.errors }}
+          {{ form.title }}
+        </div>
       </div>
 
       <div class="form-row mb-2">
         <label for="{{ form.text.id_for_label }}" class="col-form-label col-sm-3 col-md-2 mr-1">Text</label>
-        {{ form.text }}
+        <div class="col-sm-6 px-0 col-sm-8 col-md-9">
+          {{ form.text.errors }}
+          {{ form.text }}
+        </div>
       </div>
 
       <div class="form-row mb-3">
         <label for="{{ form.tags.id_for_label }}" class="col-form-label col-sm-3 col-md-2 mr-1">Tags</label>
-        {{ form.tags }}
+        <div class="col-sm-6 px-0 col-sm-8 col-md-9">
+          {{ form.tags.errors }}
+          {{ form.tags }}
+        </div>
       </div>
 
       <div class="form-row">

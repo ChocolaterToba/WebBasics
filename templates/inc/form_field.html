@@ -1,0 +1,39 @@
+{% load form_field_filter %}
+{% load static %}
+
+<div class="form-row mb-2">
+  <label for="{{ field.id_for_label }}" class="col-form-label mt-auto col-sm-3 col-md-2 mr-1">{{ field.label }}</label>
+  <div class="px-0 col-sm-8 col-md-9">
+    {% if field.errors %}
+      <ul class="list-unstyled">
+        {% for error in field.errors %}
+          <li class="error">
+            {{ error }}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if field|field_type == 'ImageField' %}
+      <div class="custom-image-file">
+        {% if user.is_authorised %}
+          <img src="{{ user.profile.avatar.url }}" class="file-image-preview rounded mb-2"
+           id="newAvatarImage" alt="new avatar image">
+          <div id="file_button_{{ field.id_for_label }}" class="file-button right-col form-control"
+           onclick="getFile('{{ field.id_for_label }}')">Click to upload a new avatar</div>
+
+        {% else %}
+          <img src="{% static 'img/Toba.jpg' %}" class="file-image-preview rounded mb-2"
+           id="newAvatarImage" alt="new avatar image">
+          <div id="file_button_{{ field.id_for_label }}" class="file-button right-col form-control"
+           onclick="getFile('{{ field.id_for_label }}')">Click to upload an avatar</div>
+        {% endif %}
+
+        {{ field }}
+      </div>
+
+    {% else %}
+      {{ field }}
+    {% endif %}
+  </div>
+</div>

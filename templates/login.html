@@ -20,22 +20,11 @@
     <form action="{{ request.get_full_path }}" method="POST">
       {% csrf_token %}
 
-      {% if error %}
-        <div class="error form-row mb-2">
-          <div class="col-sm-3 col-md-2 mr-1"></div>
-          {{ error }}
-        </div>
-      {% endif %}
+      {% include 'inc/non_field_errors.html' %}
 
-      <div class="form-row mb-2">
-        <label for="{{ form.username.id_for_label }}" class="col-form-label col-sm-3 col-md-2 mr-1">Login</label>
-        {{ form.username }}
-      </div>
-
-      <div class="form-row mb-3">
-        <label for="{{ form.password.id_for_label }}" class="col-form-label col-sm-3 col-md-2 mr-1">Password</label>
-        {{ form.password }}
-      </div>
+      {% for field in form %}
+        {% include 'inc/form_field.html' %}
+      {% endfor %}
 
       <div class="form-row">
         <div class="col-sm-3 col-md-2 mr-1"></div>

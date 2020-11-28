@@ -24,3 +24,7 @@ hr {
 .correct-answer-marker {
     color: darkgreen;
 }
+
+.error {
+    color: red;
+}
