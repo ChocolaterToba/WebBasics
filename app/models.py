@@ -12,7 +12,7 @@ class Profile(models.Model):
                                 on_delete=models.CASCADE,
                                 related_name='profile')
 
-    avatar = models.ImageField(upload_to='avatars/',
+    avatar = models.ImageField(upload_to='avatars/%Y/%m/%d',
                                default='avatars/Toba.jpg',
                                height_field=None, width_field=None,
                                max_length=256, verbose_name='Avatar')
@@ -146,11 +146,15 @@ class QuestionLike(models.Model):
     question = models.ForeignKey('Question', on_delete=models.CASCADE,
                                  related_name="questionlikes",
                                  verbose_name='Liked question')
-    is_a_like = models.IntegerField(default=-1,
-                                    choices=(
-                                        (-1, 'Dislike'),
-                                        (1,  'Like')
-                                    ),
+    LIKE = 1
+    DISLIKE = -1
+
+    LIKE_CHOICES = (
+        (LIKE, "Like"),
+        (DISLIKE, "Dislike"),
+    )
+    is_a_like = models.IntegerField(default=DISLIKE,
+                                    choices=LIKE_CHOICES,
                                     verbose_name='Is that a like?')
 
     def __str__(self):
@@ -171,11 +175,15 @@ class AnswerLike(models.Model):
     answer = models.ForeignKey('Answer', on_delete=models.CASCADE,
                                related_name="answerlikes",
                                verbose_name='Liked answer')
-    is_a_like = models.IntegerField(default=-1,
-                                    choices=(
-                                        (-1, 'Dislike'),
-                                        (1,  'Like')
-                                    ),
+    LIKE = 1
+    DISLIKE = -1
+
+    LIKE_CHOICES = (
+        (LIKE, "Like"),
+        (DISLIKE, "Dislike"),
+    )
+    is_a_like = models.IntegerField(default=DISLIKE,
+                                    choices=LIKE_CHOICES,
                                     verbose_name='Is that a like?')
 
     def __str__(self):

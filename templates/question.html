@@ -12,6 +12,10 @@
 <link href="{% static 'css/bottom_navbar.css' %}" rel="stylesheet">
 {% endblock styles %}
 
+{% block scripts %}
+<script type="text/javascript" src="{% static 'js/likeDislike.js' %}" charset="UTF-8"></script>
+{% endblock scripts %}
+
 {% block content %}
 <ul class="list-unstyled mr-5">
   {% include 'inc/one_question.html' %}

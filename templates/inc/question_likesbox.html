@@ -5,17 +5,21 @@
   <p class="nickname">{{ question.author.nickname }}</p>
   <div class="likes-box d-flex flex-column align-items-center mb-auto">
     {% if question.liked_or_disliked == 'Liked' %}
-      <img src="{% static 'img/caret-up-fill.svg' %}" alt="like button">
+      <img src="{% static 'img/caret-up-fill.svg' %}" class="js-vote" id="questionLike{{ question.id }}"
+       data-action="unlike" data-question_id="{{ question.id }}" alt="like button">
     {% else %}
-      <img src="{% static 'img/caret-up.svg' %}" alt="like button">
+      <img src="{% static 'img/caret-up.svg' %}" class="js-vote" id="questionLike{{ question.id }}"
+       data-action="like" data-question_id="{{ question.id }}" alt="like button">
     {% endif %}
 
-    <h4 class="likes-amount m-0">{{ question.rating }}</h4>
+    <h4 class="likes-amount m-0" id="questionRating{{ question.id }}">{{ question.rating }}</h4>
 
     {% if question.liked_or_disliked == 'Disliked' %}
-      <img src="{% static 'img/caret-down-fill.svg' %}" alt="like button">
+      <img src="{% static 'img/caret-down-fill.svg' %}" class="js-vote" id="questionDislike{{ question.id }}"
+       data-action="undislike" data-question_id="{{ question.id }}" alt="dislike button">
     {% else %}
-      <img src="{% static 'img/caret-down.svg' %}" alt="like button">
+      <img src="{% static 'img/caret-down.svg' %}" class="js-vote" id="questionDislike{{ question.id }}"
+       data-action="dislike" data-question_id="{{ question.id }}" alt="dislike button">
     {% endif %}
   </div>
 </div>

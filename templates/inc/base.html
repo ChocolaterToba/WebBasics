@@ -18,8 +18,6 @@
     {% block styles %}
     {% endblock styles %}
 
-    {% block scripts %}
-    {% endblock scripts %}
   </head>
   <body>
     {% include 'inc/navbar.html' %}
@@ -50,4 +48,9 @@
         </div>
       </div>
     </main>
+
+    <script src="{% static 'js/jquery-3.5.1.min.js' %}"></script>
+    {% block scripts %}
+    {% endblock scripts %}
+  </body>  
 </html>

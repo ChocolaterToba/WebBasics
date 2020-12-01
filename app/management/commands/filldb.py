@@ -267,7 +267,7 @@ class Command(BaseCommand):
         question_likes_generator = (QuestionLike(
             user_id=choice(profile_ids),
             question_id=choice(question_ids),
-            is_a_like=choice((1, -1))
+            is_a_like=choice((1, -1)),
             ) for i in range(question_likes_amount))
 
         self.bulk_create_in_batches(question_likes_amount, question_likes_generator, QuestionLike, True)
