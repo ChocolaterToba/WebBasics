@@ -16,7 +16,7 @@
 
     {% if field|field_type == 'ImageField' %}
       <div class="custom-image-file">
-        {% if user.is_authorised %}
+        {% if user.is_authenticated %}
           <img src="{{ user.profile.avatar.url }}" class="file-image-preview rounded mb-2"
            id="newAvatarImage" alt="new avatar image">
           <div id="file_button_{{ field.id_for_label }}" class="file-button right-col form-control"
