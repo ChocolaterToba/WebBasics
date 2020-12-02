@@ -1,7 +1,9 @@
 from typing import Union
+from math import ceil
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.core.paginator import Paginator, Page
 
 from AskAglicheev.settings import STATIC_URL
@@ -92,9 +94,18 @@ def question(request, question_id):
                     text=form.cleaned_data['text']
                 )
 
-                response = redirect('question', question_id=question_id)
-                response['Location'] += '#answer{}'.format(answer.id)
-                return response
+                page_number = 1
+                answers = Question.objects.get(id=question_id).answers.best().all()
+                for i, other_answer in enumerate(answers):
+                    if other_answer == answer:
+                        print(i, answer, other_answer)
+                        page_number = int(i / 5) + 1
+                        break
+
+                return redirect(
+                    reverse('question', args=[question_id]) +
+                        '?page={}#answer{}'.format(page_number, answer.id)
+                )
 
             return render(request, 'question.html', {
                 'question': check_if_liked_post(request.user, question),
@@ -114,7 +125,8 @@ def question(request, question_id):
                 'form': AnswerForm(),
                 }
             )
-    except:
+    except Exception as e:
+        print(e)
         return render(request, '404.html', {
             'user': request.user,
             }
