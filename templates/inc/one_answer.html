@@ -12,13 +12,14 @@
       <div class="form-check form-check-inline">
         {% if question.author.id == user.profile.id %}
           {% if answer.is_correct %}
-            <input class="form-check-input" type="checkbox" id="checkboxAnswer{{ answer.id }}"
-             value="option{{ answer.id }}" checked>
+            <input class="form-check-input js-mark-correct" type="checkbox" id="checkboxAnswer{{ answer.id }}"
+             data-action="uncheck" data-question_id="{{ question.id }}" data-answer_id="{{ answer.id }}" checked>
           {% else %}
-            <input class="form-check-input" type="checkbox" id="checkboxAnswer{{ answer.id }}"
-             value="option{{ answer.id }}">
+            <input class="form-check-input js-mark-correct" type="checkbox" id="checkboxAnswer{{ answer.id }}"
+             data-action="check" data-question_id="{{ question.id }}" data-answer_id="{{ answer.id }}">
           {% endif %}
           <label class="form-check-label" for="checkboxAnswer{{ answer.id }}">Correct!</label>
+
         {% elif answer.is_correct %}
           <p class="correct-answer-marker mb-0">This answer is correct</p>
         {% endif %}

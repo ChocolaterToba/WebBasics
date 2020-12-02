@@ -28,7 +28,7 @@ def paginate(objects_list, request, per_page=10):
     return paginator.get_page(page_number)
 
 
-def CheckIfLikedPost(user: User, post: Union[Question, Answer]):
+def check_if_liked_post(user: User, post: Union[Question, Answer]):
     result = model_to_dict(post)
 
     # Replacing author field with actual author instead of IDs.
@@ -41,26 +41,26 @@ def CheckIfLikedPost(user: User, post: Union[Question, Answer]):
 
     # Adding whether or not user liked/disliked that post.
     if user.is_authenticated:
-        result['liked_or_disliked'] = post.LikedOrDislikedBy(user.profile)
+        result['liked_or_disliked'] = post.liked_or_disliked_by(user.profile)
     else:
         result['Liked_or_disliked'] = 'NoVote'
     return result
 
 
-def CheckIfLikedPage(user: User, page: Page):
-    page.object_list = [CheckIfLikedPost(user, post)
+def check_if_liked_page(user: User, page: Page):
+    page.object_list = [check_if_liked_post(user, post)
                         for post in page.object_list]
     return page
 
 
 def index(request):
-    questions = Question.objects.New().all().prefetch_related(
+    questions = Question.objects.new().all().prefetch_related(
                     'author', 'tags', 'likes'
                 )
     page = paginate(questions, request, 5)
 
     return render(request, 'index.html', {
-        'page': CheckIfLikedPage(request.user, page),
+        'page': check_if_liked_page(request.user, page),
         'page_end_diff': page.paginator.num_pages - page.number,
         'user': request.user,
         }
@@ -70,13 +70,13 @@ def index(request):
 def question(request, question_id):
     try:
         question = Question.objects.get(id=question_id)
-        answers = question.answers.Best().all().prefetch_related('likes')
+        answers = question.answers.best().all().prefetch_related('likes')
         page = paginate(answers, request, 5)
 
         if not request.user.is_authenticated:
             return render(request, 'question.html', {
-                'question': CheckIfLikedPost(request.user, question),
-                'page': CheckIfLikedPage(request.user, page),
+                'question': check_if_liked_post(request.user, question),
+                'page': check_if_liked_page(request.user, page),
                 'page_end_diff': page.paginator.num_pages - page.number,
                 'user': request.user,
                 'form': AnswerForm(),
@@ -97,8 +97,8 @@ def question(request, question_id):
                 return response
 
             return render(request, 'question.html', {
-                'question': CheckIfLikedPost(request.user, question),
-                'page': CheckIfLikedPage(request.user, page),
+                'question': check_if_liked_post(request.user, question),
+                'page': check_if_liked_page(request.user, page),
                 'page_end_diff': page.paginator.num_pages - page.number,
                 'user': request.user,
                 'form': form,
@@ -107,8 +107,8 @@ def question(request, question_id):
 
         else:
             return render(request, 'question.html', {
-                'question': CheckIfLikedPost(request.user, question),
-                'page': CheckIfLikedPage(request.user, page),
+                'question': check_if_liked_post(request.user, question),
+                'page': check_if_liked_page(request.user, page),
                 'page_end_diff': page.paginator.num_pages - page.number,
                 'user': request.user,
                 'form': AnswerForm(),
@@ -287,12 +287,12 @@ def settings(request):
 
 
 def tag(request, tag):
-    questions = Question.objects.HotWithTag(tag).all().prefetch_related(
+    questions = Question.objects.hot_with_tag(tag).all().prefetch_related(
                     'author', 'tags', 'likes'
                 )
     page = paginate(questions, request, 5)
     return render(request, 'tag.html', {
-        'page': CheckIfLikedPage(request.user, page),
+        'page': check_if_liked_page(request.user, page),
         'page_end_diff': page.paginator.num_pages - page.number,
         'user': request.user,
         'tag': tag,
@@ -301,12 +301,12 @@ def tag(request, tag):
 
 
 def hot(request):
-    questions = Question.objects.Hot().all().prefetch_related(
+    questions = Question.objects.hot().all().prefetch_related(
                     'author', 'tags', 'likes'
                 )
     page = paginate(questions, request, 5)
     return render(request, 'hot_questions.html', {
-        'page': CheckIfLikedPage(request.user, page),
+        'page': check_if_liked_page(request.user, page),
         'page_end_diff': page.paginator.num_pages - page.number,
         'user': request.user,
         }
@@ -316,7 +316,6 @@ def hot(request):
 @login_required
 def vote(request):
     data = request.POST
-    print(data)
     if 'question_id' in data:
         question = Question.objects.get(id=data['question_id'])
         action = data['action']
@@ -550,3 +549,25 @@ def vote(request):
                 },
                 status=500,
             )
+
+@require_POST
+@login_required
+def mark_correct(request):
+    data = request.POST
+    print(data)
+    # Maybe also add check for question's existence???
+    question = Question.objects.get(id=data['question_id'])
+    if question.author_id == request.user.profile.id:
+        answer = question.answers.get(id=data['answer_id'])
+        answer.is_correct = not answer.is_correct
+        answer.save()
+        return JsonResponse({
+            'success': True,
+            }
+        )
+    return JsonResponse({
+            'success': False,
+            'error': "Users can't check correct answers on other users' questions",
+            },
+            status=500,
+        )

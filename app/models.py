@@ -36,19 +36,19 @@ def update_user_profile(sender, instance, created, **kwargs):
 
 
 class QuestionManager(models.Manager):
-    def SearchByTag(self, tag):
+    def search_by_tag(self, tag):
         return self.filter(tags__name=tag)
 
-    def HotWithTag(self, tag):
-        return self.SearchByTag(tag).order_by('-rating')
+    def hot_with_tag(self, tag):
+        return self.search_by_tag(tag).order_by('-rating')
 
-    def New(self):
+    def new(self):
         return self.order_by('-publishing_date')
 
-    def Hot(self):
+    def hot(self):
         return self.order_by('-rating')
 
-    def Best(self):
+    def best(self):
         return self.order_by('-rating')
 
 
@@ -73,7 +73,7 @@ class Question(models.Model):
     def __str__(self):
         return self.title
 
-    def LikedOrDislikedBy(self, user):
+    def liked_or_disliked_by(self, user):
         try:
             if self.questionlikes.get(user_id=user.id).is_a_like == 1:
                 return 'Liked'
@@ -88,7 +88,7 @@ class Question(models.Model):
 
 
 class AnswerManager(models.Manager):
-    def Best(self):
+    def best(self):
         return self.order_by('-rating')
 
 
@@ -113,7 +113,7 @@ class Answer(models.Model):
             return self.text[:30] + '...'
         return self.text
 
-    def LikedOrDislikedBy(self, user):
+    def liked_or_disliked_by(self, user):
         try:
             if self.answerlikes.get(user_id=user.id).is_a_like == 1:
                 return 'Liked'

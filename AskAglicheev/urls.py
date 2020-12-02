@@ -34,4 +34,5 @@ urlpatterns = [
     path('hot/', views.hot, name='hot'),
     path('logout/', views.logout, name='logout'),
     path('vote/', views.vote, name='vote'),
+    path('mark_correct/', views.mark_correct, name='mark_correct'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

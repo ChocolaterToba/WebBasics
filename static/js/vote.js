@@ -58,7 +58,7 @@ $('.js-vote').click(function(event) {
                     $('#questionDislike' + questionID).data('action', json.dislike_action);
                 }
 
-                console.log('Success'); // another sanity check
+                console.log('Vote successfull');
             },
 
             error : function(jqXHR, errmsg, err) {
@@ -87,7 +87,7 @@ $('.js-vote').click(function(event) {
                     $('#answerDislike' + answerID).data('action', json.dislike_action);
                 }
 
-                console.log('Success'); // another sanity check
+                console.log('Vote successfull'); // another sanity check
             },
 
             error : function(jqXHR, errmsg, err) {
