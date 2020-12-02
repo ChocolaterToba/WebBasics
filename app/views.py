@@ -95,8 +95,8 @@ def question(request, question_id):
                 )
 
                 page_number = 1
-                answers = Question.objects.get(id=question_id).answers.best().all()
-                for i, other_answer in enumerate(answers):
+                answers = Question.objects.get(id=question_id).answers.best()
+                for i, other_answer in enumerate(answers.all()):
                     if other_answer == answer:
                         print(i, answer, other_answer)
                         page_number = int(i / 5) + 1
@@ -104,7 +104,7 @@ def question(request, question_id):
 
                 return redirect(
                     reverse('question', args=[question_id]) +
-                        '?page={}#answer{}'.format(page_number, answer.id)
+                    '?page={}#answer{}'.format(page_number, answer.id)
                 )
 
             return render(request, 'question.html', {
@@ -227,7 +227,7 @@ def login(request):
                 return redirect(next_page)
             else:
                 form.add_error(None, 'Incorrect login or password')
-        
+
         print(form.errors)
 
         return render(request, 'login.html', {
@@ -324,6 +324,7 @@ def hot(request):
         }
     )
 
+
 @require_POST
 @login_required
 def vote(request):
@@ -387,7 +388,7 @@ def vote(request):
                 },
                 status=500,
             )
-        
+
         elif action == 'dislike':
             dislike, created = QuestionLike.objects.get_or_create(
                 user_id=request.user.profile.id,
@@ -504,7 +505,7 @@ def vote(request):
                 },
                 status=500,
             )
-        
+
         elif action == 'dislike':
             dislike, created = AnswerLike.objects.get_or_create(
                 user_id=request.user.profile.id,
@@ -562,6 +563,7 @@ def vote(request):
                 status=500,
             )
 
+
 @require_POST
 @login_required
 def mark_correct(request):
@@ -579,7 +581,8 @@ def mark_correct(request):
         )
     return JsonResponse({
             'success': False,
-            'error': "Users can't check correct answers on other users' questions",
+            'error': "Users can't check answers as correct "
+                     "on other users' questions",
             },
             status=500,
         )
