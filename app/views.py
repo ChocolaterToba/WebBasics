@@ -2,15 +2,16 @@ from typing import Union
 from math import ceil
 
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.core.paginator import Paginator, Page
 
 from AskAglicheev.settings import STATIC_URL
 
 from django.forms.models import model_to_dict
-from django.db.models.query import QuerySet
 from django.db import transaction
+from django.db.models.query import QuerySet
+from django.db.models import F
 
 from app.models import Profile, Question, Answer, QuestionLike, AnswerLike
 from django.contrib.auth.models import User
@@ -54,6 +55,16 @@ def check_if_liked_page(user: User, page: Page):
                         for post in page.object_list]
     return page
 
+def update_rating(type: Union[Question, Answer], id, diff):
+    with transaction.atomic():
+        if type == Question:
+            post = Question.objects.select_for_update().get(id=id)
+        else:
+            post = Answer.objects.select_for_update().get(id=id)
+        post.rating = F('rating') + diff
+        post.save()
+        post.refresh_from_db()
+    return post.rating
 
 def index(request):
     questions = Question.objects.new().all().prefetch_related(
@@ -330,19 +341,18 @@ def hot(request):
 def vote(request):
     data = request.POST
     if 'question_id' in data:
-        question = Question.objects.get(id=data['question_id'])
+        question_id = data['question_id']
+        question = get_object_or_404(Question, id=question_id)
         action = data['action']
         if action == 'like':
             like, created = QuestionLike.objects.get_or_create(
                 user_id=request.user.profile.id,
-                question_id=question.id,
+                question_id=question_id,
             )
             if created:
-                question.rating += 1
-                question.save()
+                question_rating = update_rating(Question, question_id, 1)
             elif like.is_a_like == QuestionLike.DISLIKE:
-                question.rating += 2
-                question.save()
+                question_rating = update_rating(Question, question_id, 2)
             else:
                 return JsonResponse({
                     'success': False,
@@ -354,7 +364,7 @@ def vote(request):
             like.is_a_like = QuestionLike.LIKE
             like.save()
             return JsonResponse({
-                'question_rating': question.rating,
+                'question_rating': question_rating,
                 'like_src': STATIC_URL + 'img/caret-up-fill.svg',
                 'like_action': 'unlike',
                 'dislike_src': STATIC_URL + 'img/caret-down.svg',
@@ -365,18 +375,17 @@ def vote(request):
         elif action == 'undislike':
             dislike = QuestionLike.objects.filter(
                 user_id=request.user.profile.id,
-                question_id=question.id,
+                question_id=question_id,
             )
 
             if dislike.exists():
                 dislike = dislike.first()
                 if dislike.is_a_like == QuestionLike.DISLIKE:
-                    question.rating += 1
-                    question.save()
+                    question_rating = update_rating(Question, question_id, 1)
                     dislike.delete()
 
                     return JsonResponse({
-                        'question_rating': question.rating,
+                        'question_rating': question_rating,
                         'dislike_src': STATIC_URL + 'img/caret-down.svg',
                         'dislike_action': 'dislike',
                         }
@@ -392,14 +401,12 @@ def vote(request):
         elif action == 'dislike':
             dislike, created = QuestionLike.objects.get_or_create(
                 user_id=request.user.profile.id,
-                question_id=question.id,
+                question_id=question_id,
             )
             if created:
-                question.rating -= 1
-                question.save()
+                question_rating = update_rating(Question, question_id, -1)
             elif dislike.is_a_like == QuestionLike.LIKE:
-                question.rating -= 2
-                question.save()
+                question_rating = update_rating(Question, question_id, -2)
             else:
                 return JsonResponse({
                     'success': False,
@@ -411,7 +418,7 @@ def vote(request):
             dislike.is_a_like = QuestionLike.DISLIKE
             dislike.save()
             return JsonResponse({
-                'question_rating': question.rating,
+                'question_rating': question_rating,
                 'like_src': STATIC_URL + 'img/caret-up.svg',
                 'like_action': 'like',
                 'dislike_src': STATIC_URL + 'img/caret-down-fill.svg',
@@ -422,18 +429,17 @@ def vote(request):
         else:
             like = QuestionLike.objects.filter(
                 user_id=request.user.profile.id,
-                question_id=question.id,
+                question_id=question_id,
             )
 
             if like.exists():
                 like = like.first()
                 if like.is_a_like == QuestionLike.LIKE:
-                    question.rating -= 1
-                    question.save()
+                    question_rating = update_rating(Question, question_id, -1)
                     like.delete()
 
                     return JsonResponse({
-                        'question_rating': question.rating,
+                        'question_rating': question_rating,
                         'like_src': STATIC_URL + 'img/caret-up.svg',
                         'like_action': 'like',
                         }
