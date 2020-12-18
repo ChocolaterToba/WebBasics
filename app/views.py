@@ -12,6 +12,7 @@ from django.forms.models import model_to_dict
 from django.db import transaction
 from django.db.models.query import QuerySet
 from django.db.models import F
+from django.core.exceptions import ObjectDoesNotExist
 
 from app.models import Profile, Question, Answer, QuestionLike, AnswerLike
 from django.contrib.auth.models import User
@@ -341,233 +342,129 @@ def hot(request):
 def vote(request):
     data = request.POST
     if 'question_id' in data:
-        question_id = data['question_id']
-        question = get_object_or_404(Question, id=question_id)
-        action = data['action']
-        if action == 'like':
-            like, created = QuestionLike.objects.get_or_create(
-                user_id=request.user.profile.id,
-                question_id=question_id,
-            )
-            if created:
-                question_rating = update_rating(Question, question_id, 1)
-            elif like.is_a_like == QuestionLike.DISLIKE:
-                question_rating = update_rating(Question, question_id, 2)
-            else:
-                return JsonResponse({
-                    'success': False,
-                    'error': "Can't like question that is liked already",
-                    },
-                    status=500,
-                )
-
-            like.is_a_like = QuestionLike.LIKE
-            like.save()
-            return JsonResponse({
-                'question_rating': question_rating,
-                'like_src': STATIC_URL + 'img/caret-up-fill.svg',
-                'like_action': 'unlike',
-                'dislike_src': STATIC_URL + 'img/caret-down.svg',
-                'dislike_action': 'dislike',
-                }
-            )
-
-        elif action == 'undislike':
-            dislike = QuestionLike.objects.filter(
-                user_id=request.user.profile.id,
-                question_id=question_id,
-            )
-
-            if dislike.exists():
-                dislike = dislike.first()
-                if dislike.is_a_like == QuestionLike.DISLIKE:
-                    question_rating = update_rating(Question, question_id, 1)
-                    dislike.delete()
-
-                    return JsonResponse({
-                        'question_rating': question_rating,
-                        'dislike_src': STATIC_URL + 'img/caret-down.svg',
-                        'dislike_action': 'dislike',
-                        }
-                    )
-
-            return JsonResponse({
-                'success': False,
-                'error': "Can't undislike question that is not disliked",
-                },
-                status=500,
-            )
-
-        elif action == 'dislike':
-            dislike, created = QuestionLike.objects.get_or_create(
-                user_id=request.user.profile.id,
-                question_id=question_id,
-            )
-            if created:
-                question_rating = update_rating(Question, question_id, -1)
-            elif dislike.is_a_like == QuestionLike.LIKE:
-                question_rating = update_rating(Question, question_id, -2)
-            else:
-                return JsonResponse({
-                    'success': False,
-                    'error': "Can't dislike question that is disliked already",
-                    },
-                    status=500,
-                )
-
-            dislike.is_a_like = QuestionLike.DISLIKE
-            dislike.save()
-            return JsonResponse({
-                'question_rating': question_rating,
-                'like_src': STATIC_URL + 'img/caret-up.svg',
-                'like_action': 'like',
-                'dislike_src': STATIC_URL + 'img/caret-down-fill.svg',
-                'dislike_action': 'undislike',
-                }
-            )
-
-        else:
-            like = QuestionLike.objects.filter(
-                user_id=request.user.profile.id,
-                question_id=question_id,
-            )
-
-            if like.exists():
-                like = like.first()
-                if like.is_a_like == QuestionLike.LIKE:
-                    question_rating = update_rating(Question, question_id, -1)
-                    like.delete()
-
-                    return JsonResponse({
-                        'question_rating': question_rating,
-                        'like_src': STATIC_URL + 'img/caret-up.svg',
-                        'like_action': 'like',
-                        }
-                    )
-
-            return JsonResponse({
-                'success': False,
-                'error': "Can't unlike question that is not liked",
-                },
-                status=500,
-            )
-
+        post_type = Question
+        vote_type = QuestionLike
+        post_name = 'question'
+        id = data['question_id']
+        vote, created = QuestionLike.objects.get_or_create(
+            user_id=request.user.profile.id,
+            question_id=id,
+        )
     elif 'answer_id' in data:
-        answer = Answer.objects.get(id=data['answer_id'])
-        action = data['action']
-        if action == 'like':
-            like, created = AnswerLike.objects.get_or_create(
-                user_id=request.user.profile.id,
-                answer_id=answer.id,
-            )
-            if created:
-                answer.rating += 1
-                answer.save()
-            elif like.is_a_like == AnswerLike.DISLIKE:
-                answer.rating += 2
-                answer.save()
-            else:
-                return JsonResponse({
-                    'success': False,
-                    'error': "Can't like answer that is liked already",
-                    },
-                    status=500,
-                )
+        post_type = Answer
+        vote_type = AnswerLike
+        post_name = 'answer'
+        id = data['answer_id']
+        vote, created = AnswerLike.objects.get_or_create(
+            user_id=request.user.profile.id,
+            answer_id=id,
+        )
+    else :
+        return JsonResponse({
+            'success': False,
+            'error': "Incorrect format: question/answer's id needed",
+            },
+            status=500,
+        )
 
-            like.is_a_like = AnswerLike.LIKE
-            like.save()
+    try:
+        post = post_type.objects.get(id=id)
+    except ObjectDoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': "{} with given id does not exist".format(post_name).capitalize(),
+            },
+            status=500,
+        )
+
+    action = data['action']
+    if action == 'like':
+        if created:
+            rating = update_rating(post_type, id, 1)
+        elif vote.is_a_like == vote_type.DISLIKE:
+            rating = update_rating(post_type, id, 2)
+        else:
             return JsonResponse({
-                'answer_rating': answer.rating,
-                'like_src': STATIC_URL + 'img/caret-up-fill.svg',
-                'like_action': 'unlike',
+                'success': False,
+                'error': "Can't like {} that is liked already".format(post_name),
+                },
+                status=500,
+            )
+
+        vote.is_a_like = vote_type.LIKE
+        vote.save()
+        return JsonResponse({
+            post_name + '_rating': rating,
+            'like_src': STATIC_URL + 'img/caret-up-fill.svg',
+            'like_action': 'unlike',
+            'dislike_src': STATIC_URL + 'img/caret-down.svg',
+            'dislike_action': 'dislike',
+            }
+        )
+
+    elif action == 'undislike':
+        if vote.is_a_like == vote_type.DISLIKE:
+            rating = update_rating(post_type, id, 2)
+            vote.delete()
+
+            return JsonResponse({
+                post_name + '_rating': rating,
                 'dislike_src': STATIC_URL + 'img/caret-down.svg',
                 'dislike_action': 'dislike',
                 }
             )
 
-        elif action == 'undislike':
-            dislike = AnswerLike.objects.filter(
-                user_id=request.user.profile.id,
-                answer_id=answer.id,
-            )
+        vote.delete()
+        return JsonResponse({
+            'success': False,
+            'error': "Can't undislike {} that is not disliked".format(post_name),
+            },
+            status=500,
+        )
 
-            if dislike.exists():
-                dislike = dislike.first()
-                if dislike.is_a_like == AnswerLike.DISLIKE:
-                    answer.rating += 1
-                    answer.save()
-                    dislike.delete()
-
-                    return JsonResponse({
-                        'answer_rating': answer.rating,
-                        'dislike_src': STATIC_URL + 'img/caret-down.svg',
-                        'dislike_action': 'dislike',
-                        }
-                    )
-
+    elif action == 'dislike':
+        if created:
+            rating = update_rating(post_type, id, -1)
+        elif vote.is_a_like == vote_type.LIKE:
+            rating = update_rating(post_type, id, -2)
+        else:
             return JsonResponse({
                 'success': False,
-                'error': "Can't undislike answer that is not disliked",
+                'error': "Can't dislike {} that is disliked already".format(post_name),
                 },
                 status=500,
             )
 
-        elif action == 'dislike':
-            dislike, created = AnswerLike.objects.get_or_create(
-                user_id=request.user.profile.id,
-                answer_id=answer.id,
-            )
-            if created:
-                answer.rating -= 1
-                answer.save()
-            elif dislike.is_a_like == AnswerLike.LIKE:
-                answer.rating -= 2
-                answer.save()
-            else:
-                return JsonResponse({
-                    'success': False,
-                    'error': "Can't dislike answer that is disliked already",
-                    },
-                    status=500,
-                )
+        vote.is_a_like = vote_type.DISLIKE
+        vote.save()
+        return JsonResponse({
+            post_name + '_rating': rating,
+            'like_src': STATIC_URL + 'img/caret-up.svg',
+            'like_action': 'like',
+            'dislike_src': STATIC_URL + 'img/caret-down-fill.svg',
+            'dislike_action': 'undislike',
+            }
+        )
 
-            dislike.is_a_like = AnswerLike.DISLIKE
-            dislike.save()
+    elif action == 'unlike':
+        if vote.is_a_like == vote_type.LIKE:
+            rating = update_rating(post_type, id, -1)
+            vote.delete()
+
             return JsonResponse({
-                'answer_rating': answer.rating,
+                post_name + '_rating': rating,
                 'like_src': STATIC_URL + 'img/caret-up.svg',
                 'like_action': 'like',
-                'dislike_src': STATIC_URL + 'img/caret-down-fill.svg',
-                'dislike_action': 'undislike',
                 }
             )
 
-        else:
-            like = AnswerLike.objects.filter(
-                user_id=request.user.profile.id,
-                answer_id=answer.id,
-            )
-
-            if like.exists():
-                like = like.first()
-                if like.is_a_like == AnswerLike.LIKE:
-                    answer.rating -= 1
-                    answer.save()
-                    like.delete()
-
-                    return JsonResponse({
-                        'answer_rating': answer.rating,
-                        'like_src': STATIC_URL + 'img/caret-up.svg',
-                        'like_action': 'like',
-                        }
-                    )
-
-            return JsonResponse({
-                'success': False,
-                'error': "Can't unlike answer that is not liked",
-                },
-                status=500,
-            )
+        vote.delete()
+        return JsonResponse({
+            'success': False,
+            'error': "Can't unlike {} that is not liked".format(post_name),
+            },
+            status=500,
+        )
 
 
 @require_POST
