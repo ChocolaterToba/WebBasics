@@ -404,7 +404,7 @@ def vote(request):
 
     elif action == 'undislike':
         if vote.is_a_like == vote_type.DISLIKE:
-            rating = update_rating(post_type, id, 2)
+            rating = update_rating(post_type, id, 1)
             vote.delete()
 
             return JsonResponse({
