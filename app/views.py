@@ -403,6 +403,15 @@ def vote(request):
         )
 
     elif action == 'undislike':
+        if created:
+            vote.delete()
+            return JsonResponse({
+                'success': False,
+                'error': "Can't undislike {} that is not disliked".format(post_name),
+                },
+                status=500,
+            )
+
         if vote.is_a_like == vote_type.DISLIKE:
             rating = update_rating(post_type, id, 1)
             vote.delete()
@@ -414,15 +423,15 @@ def vote(request):
                 }
             )
 
-        vote.delete()
         return JsonResponse({
             'success': False,
-            'error': "Can't undislike {} that is not disliked".format(post_name),
+            'error': "Can't undislike {} that is liked".format(post_name),
             },
             status=500,
         )
 
     elif action == 'dislike':
+        print(vote.is_a_like == vote_type.LIKE)
         if created:
             rating = update_rating(post_type, id, -1)
         elif vote.is_a_like == vote_type.LIKE:
@@ -447,6 +456,15 @@ def vote(request):
         )
 
     elif action == 'unlike':
+        if created:
+            vote.delete()
+            return JsonResponse({
+                'success': False,
+                'error': "Can't unlike {} that is not liked".format(post_name),
+                },
+                status=500,
+            )
+
         if vote.is_a_like == vote_type.LIKE:
             rating = update_rating(post_type, id, -1)
             vote.delete()
@@ -458,14 +476,12 @@ def vote(request):
                 }
             )
 
-        vote.delete()
         return JsonResponse({
             'success': False,
-            'error': "Can't unlike {} that is not liked".format(post_name),
+            'error': "Can't unlike {} that is disliked".format(post_name),
             },
             status=500,
         )
-
 
 @require_POST
 @login_required
