@@ -49,7 +49,7 @@ def hello_world(environ, start_response):
                                   for key in post_dict.keys()) +
                    '</p>')
 
-    age = post_dict.get(b'age', [''])[0].decode()
+    age = post_dict.get(b'age', [b''])[0].decode()
 
     response_body = html % {
         'age': age,
