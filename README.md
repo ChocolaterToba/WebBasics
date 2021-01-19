@@ -5,7 +5,7 @@ To launch website itself:
 - run python manage.py runserver
 OR
 - run gunicorn AskAglicheev.wsgi
-- also run nginx which proxies requests to port 8000
+- run nginx with additional config provided in AskAglicheev.conf
 
 To launch simple "Hello, World" wsgi script:
 - run gunicorn -c wsgi_hello_world.conf.py wsgi_hello_world:hello_world
