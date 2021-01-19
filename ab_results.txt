@@ -1,0 +1,218 @@
+static files (hello_world.html)
+"""
+<html>
+  <body>
+    <h1>Hello, world!</h1>
+    <form method="post" action="">
+        <p>
+           Age: <input type="text" name="age" value="%(age)s">
+        </p>
+        <p>
+            <input type="submit" value="Submit">
+        </p>
+    </form>
+
+    <h3>GET parameters from request:</h3>
+
+    <h3>POST parameters from request:</h3>
+  </body>
+</html>
+"""
+
+nginx:
+Server Software:        nginx/1.18.0
+Server Hostname:        localhost
+Server Port:            80
+
+Document Path:          /hello_world
+Document Length:        368 bytes
+
+Concurrency Level:      100
+Time taken for tests:   0.680 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      511000 bytes
+HTML transferred:       368000 bytes
+Requests per second:    1470.81 [#/sec] (mean)
+Time per request:       67.990 [ms] (mean)
+Time per request:       0.680 [ms] (mean, across all concurrent requests)
+Transfer rate:          733.97 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    2   5.5      0      21
+Processing:    17   58  10.3     61      79
+Waiting:       14   58  10.6     60      72
+Total:         38   61   7.0     61      79
+
+Percentage of the requests served within a certain time (ms)
+  50%     61
+  66%     62
+  75%     65
+  80%     66
+  90%     69
+  95%     70
+  98%     71
+  99%     72
+ 100%     79 (longest request)
+
+________________________________________________________________
+
+gunicorn:
+Server Software:        gunicorn/20.0.4
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /hello_world
+Document Length:        368 bytes
+
+Concurrency Level:      100
+Time taken for tests:   1.234 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      514000 bytes
+HTML transferred:       368000 bytes
+Requests per second:    810.64 [#/sec] (mean)
+Time per request:       123.359 [ms] (mean)
+Time per request:       1.234 [ms] (mean, across all concurrent requests)
+Transfer rate:          406.90 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   57  16.1     58      99
+Processing:     4   61  20.4     58     139
+Waiting:        2   44  22.3     43     102
+Total:         27  118  21.7    111     236
+
+Percentage of the requests served within a certain time (ms)
+  50%    111
+  66%    122
+  75%    126
+  80%    131
+  90%    146
+  95%    157
+  98%    184
+  99%    201
+ 100%    236 (longest request)
+
+gunicorn is approximately 2 times slower in that case
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+dynamic files:
+
+just gunicorn:
+Server Software:        gunicorn/20.0.4
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /
+Document Length:        13075 bytes
+
+Concurrency Level:      100
+Time taken for tests:   6.971 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      13338000 bytes
+HTML transferred:       13075000 bytes
+Requests per second:    143.45 [#/sec] (mean)
+Time per request:       697.127 [ms] (mean)
+Time per request:       6.971 [ms] (mean, across all concurrent requests)
+Transfer rate:          1868.44 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0  294 152.3    302     626
+Processing:    64  390 163.5    390     748
+Waiting:        1  308 159.8    290     746
+Total:        544  684 165.2    652    1340
+
+Percentage of the requests served within a certain time (ms)
+  50%    652
+  66%    672
+  75%    688
+  80%    703
+  90%    754
+  95%   1169
+  98%   1265
+  99%   1282
+ 100%   1340 (longest request)
+
+________________________________________________________________
+
+nginx + gunicorn
+Server Software:        nginx/1.18.0
+Server Hostname:        localhost
+Server Port:            80
+
+Document Path:          /
+Document Length:        13075 bytes
+
+Concurrency Level:      100
+Time taken for tests:   8.122 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      13335000 bytes
+HTML transferred:       13075000 bytes
+Requests per second:    123.12 [#/sec] (mean)
+Time per request:       812.247 [ms] (mean)
+Time per request:       8.122 [ms] (mean, across all concurrent requests)
+Transfer rate:          1603.26 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   38  85.0      1     464
+Processing:   332  733 146.7    780     981
+Waiting:       34  720 164.4    776     980
+Total:        403  771 102.7    789     981
+
+Percentage of the requests served within a certain time (ms)
+  50%    789
+  66%    805
+  75%    817
+  80%    833
+  90%    876
+  95%    924
+  98%    947
+  99%    953
+ 100%    981 (longest request)
+
+_________________________________________________________________
+
+nginx (with cache!) + gunicorn:
+Server Software:        nginx/1.18.0
+Server Hostname:        localhost
+Server Port:            80
+
+Document Path:          /
+Document Length:        13075 bytes
+
+Concurrency Level:      100
+Time taken for tests:   0.695 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      13335000 bytes
+HTML transferred:       13075000 bytes
+Requests per second:    1439.69 [#/sec] (mean)
+Time per request:       69.460 [ms] (mean)
+Time per request:       0.695 [ms] (mean, across all concurrent requests)
+Transfer rate:          18748.25 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    3   6.2      0      22
+Processing:    20   63  11.5     67      80
+Waiting:        1   63  12.1     66      76
+Total:         39   66   7.2     67      80
+
+Percentage of the requests served within a certain time (ms)
+  50%     67
+  66%     69
+  75%     70
+  80%     71
+  90%     73
+  95%     74
+  98%     76
+  99%     76
+ 100%     80 (longest request)
+
+It's approximately 11.7 times faster than nginx without caching

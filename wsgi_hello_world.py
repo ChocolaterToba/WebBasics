@@ -27,7 +27,7 @@ def hello_world(environ, start_response):
     get_dict = parse_qs(environ['QUERY_STRING'])
     if get_dict:
         get_params = ('<p>' +
-                      '<p></p>'.join(key + '=' + ', '.join(value for value in get_dict[key])
+                      '<p></p>'.join(key + '=' + ' & '.join(value for value in get_dict[key])
                                      for key in get_dict.keys()) +
                       '</p>')
     else:
@@ -45,7 +45,7 @@ def hello_world(environ, start_response):
     request_body = environ['wsgi.input'].read(request_body_size)
     post_dict = parse_qs(request_body)
     post_params = ('<p>' +
-                   '<p></p>'.join(key.decode() + '=' + ', '.join(value.decode() for value in post_dict[key])
+                   '<p></p>'.join(key.decode() + '=' + ' & '.join(value.decode() for value in post_dict[key])
                                   for key in post_dict.keys()) +
                    '</p>')
 

@@ -487,7 +487,6 @@ def vote(request):
 @login_required
 def mark_correct(request):
     data = request.POST
-    print(data)
     # Maybe also add check for question's existence???
     question = Question.objects.get(id=data['question_id'])
     if question.author_id == request.user.profile.id:
@@ -505,3 +504,19 @@ def mark_correct(request):
             },
             status=500,
         )
+
+def hello_world(request):
+    get_dict = request.GET
+    post_dict = request.POST.copy()
+    post_dict.pop('csrfmiddlewaretoken', None)
+
+    get_params = {key: ' & '.join(value) for key, value in get_dict.lists()}
+    post_params = {key: ' & '.join(value) for key, value in post_dict.lists()}
+
+    return render(request, 'hello_world.html', {
+        'user': request.user,
+        'get_params': get_params,
+        'post_params': post_params,
+        'age': post_dict.get('age', default=''),
+        }
+    )
