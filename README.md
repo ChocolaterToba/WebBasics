@@ -3,6 +3,7 @@ Repo for Tachnopark's Basics in Web Development course
 Prepare venv:
 - $ python3 -m venv venv
 - $ source venv/bin/activate
+- $ sudo apt-get install libpq-dev python-dev
 - $ python3 -m pip install -r requirements.txt
 
 To launch website itself:
