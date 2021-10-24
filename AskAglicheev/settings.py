@@ -83,8 +83,12 @@ WSGI_APPLICATION = 'AskAglicheev.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'django_db',
+        'USER' : 'mikhail',
+        'PASSWORD' : 'lcpUdCJgPpVUV2rg',
+        'HOST' : 'db-postgresql-fra1-70337-do-user-9873270-0.b.db.ondigitalocean.com',
+        'PORT' : '25060',
     }
 }
 
