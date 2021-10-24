@@ -30,6 +30,8 @@ ALLOWED_HOSTS = [
     '164.90.234.115',
     '46.101.101.249',
     '164.90.234.109',
+    '127.0.0.1',
+    'localhost',
 ]
 
 
@@ -84,11 +86,11 @@ WSGI_APPLICATION = 'AskAglicheev.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django_db',
+        'NAME': 'Test',
         'USER' : 'mikhail',
         'PASSWORD' : 'iNtamnlgvwhItizg',
         'HOST' : 'db-postgresql-fra1-13059-do-user-9873270-0.b.db.ondigitalocean.com',
-        'PORT' : '25060',
+        'PORT' : '25061',
     }
 }
 

@@ -68,9 +68,7 @@ def update_rating(type: Union[Question, Answer], id, diff):
     return post.rating
 
 def index(request):
-    questions = Question.objects.new().all().prefetch_related(
-                    'author', 'tags', 'likes'
-                )
+    questions = Question.objects.new().all()
     page = paginate(questions, request, 5)
 
     return render(request, 'index.html', {
