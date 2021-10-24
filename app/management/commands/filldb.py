@@ -24,7 +24,7 @@ from random import choice, choices
 f = Faker(['en-US', 'ru_RU'])
 Faker.seed(1234)
 
-BATCH_SIZE = 100000  # Batch size for bulk_create
+BATCH_SIZE = 75000  # Batch size for bulk_create
 
 
 class Command(BaseCommand):
@@ -114,32 +114,10 @@ class Command(BaseCommand):
                 )
             )
 
-            print('Updating tags...')
+            print('Linking tags to questions...')
             start_tags_time = time.time()
-
-            tag_names = list(
-                Tag.objects.values_list(
-                    'name', flat=True
-                )
-            )
-
-            max_tags_per_question = min(7, len(tag_names))
-            tags_avg = max_tags_per_question / 2
-            batch_amount = ceil(100000 / tags_avg / BATCH_SIZE)
-            for i in range(batch_amount):
-                questions_batch = Question.objects.all()[i * BATCH_SIZE:
-                                                         (i + 1) * BATCH_SIZE]
-                with transaction.atomic():
-                    for question in questions_batch:
-                        question.tags.set(choices(
-                            tag_names, k=f.random_int(
-                                min=0, max=max_tags_per_question
-                                )
-                            )
-                        )
-                        question.save()
-
-            print('Tags updated, time: {} s'.format(
+            self.fill_question_tags(questions_cnt, 7)
+            print('Tags linked, time: {} s'.format(
                 time.time() - start_tags_time
                 )
             )
@@ -228,6 +206,33 @@ class Command(BaseCommand):
             ) for i in range(cnt))
 
         self.bulk_create_in_batches(cnt, questions_generator, Question)
+    
+    def fill_question_tags(self, cnt, max_tags_per_question):
+        tag_names = list(
+            Tag.objects.values_list(
+                'name', flat=True
+            )
+        )
+        question_ids = list(
+            Question.objects.values_list(
+                'id', flat=True
+            )
+        )
+
+        max_tags_per_question=min(max_tags_per_question, len(tag_names))  # Just in case
+    
+        QuestionTag = Question.tags.through
+
+        question_tag_generator = (QuestionTag(
+            question_id=question_ids[i],
+            tag_id=choice(tag_names)
+            ) for i in range(cnt)
+            for j in range(f.random_int(min=0, max=max_tags_per_question)))
+
+        self.bulk_create_in_batches(cnt * max_tags_per_question,
+                                    question_tag_generator,
+                                    QuestionTag,
+                                    True)
 
     def fill_answers(self, cnt):
         profile_ids = list(
@@ -282,6 +287,8 @@ class Command(BaseCommand):
         self.bulk_create_in_batches(question_likes_amount,
                                     question_likes_generator,
                                     QuestionLike, True)
+        
+        print("Generated question likes, starting generating answer likes")
 
         answer_likes_generator = (AnswerLike(
             user_id=choice(profile_ids),

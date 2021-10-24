@@ -4,7 +4,7 @@ Prepare venv:
 - $ python3 -m venv venv
 - $ source venv/bin/activate
 - $ sudo apt-get -y install build-essential
-- $ sudo apt-get -y install libpq-dev python-dev
+- $ sudo apt-get -y install libpq-dev python-dev python3-dev
 - $ python3 -m pip install -r requirements.txt
 
 Prepare database:
