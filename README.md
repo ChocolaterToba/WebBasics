@@ -1,12 +1,16 @@
 # WebBasics
 Repo for Tachnopark's Basics in Web Development course
+Prepare venv:
+- $ python3 -m venv venv
+- $ source venv/bin/activate
+- $ python3 -m pip install -r requirements.txt
 
 To launch website itself:
-- run python manage.py runserver
+- $ python manage.py runserver
 OR
-- run gunicorn AskAglicheev.wsgi
-- run nginx with additional config provided in AskAglicheev.conf
+- $ gunicorn AskAglicheev.wsgi
+- $ nginx with additional config provided in AskAglicheev.conf
 
 To launch simple "Hello, World" wsgi script:
-- run gunicorn -c wsgi_hello_world.conf.py wsgi_hello_world:hello_world
+- $ gunicorn -c wsgi_hello_world.conf.py wsgi_hello_world:hello_world
 It will be accessible with localhost/8080
