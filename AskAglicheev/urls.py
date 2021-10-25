@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.urls import include, re_path
 
 from app import views
 
@@ -36,4 +37,5 @@ urlpatterns = [
     path('vote/', views.vote, name='vote'),
     path('mark_correct/', views.mark_correct, name='mark_correct'),
     path('hello_world/', views.hello_world, name='hello_world'),
+    re_path('', include('django_prometheus.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

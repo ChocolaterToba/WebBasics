@@ -2,6 +2,7 @@ asgiref==3.4.1
 click==8.0.3
 Django==3.2.8
 django-jquery==3.1.0
+django-prometheus==2.1.0
 Faker==9.5.2
 gunicorn==20.1.0
 h11==0.12.0
@@ -9,6 +10,7 @@ pickleshare==0.7.5
 Pillow==8.4.0
 pip==21.3.1
 pkg_resources==0.0.0
+prometheus-client==0.11.0
 psycopg2==2.9.1
 python-dateutil==2.8.2
 pytz==2021.3
