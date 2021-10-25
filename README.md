@@ -9,6 +9,11 @@ Prepare venv:
 
 Prepare database:
 - $ python3 manage.py migrate
+- $ apt-get install -y pgbouncer
+- create file userlist.txt with database's username and password, for example
+- "thisismyusername" "this is my password"
+- generate ssl key and certificate, change related paths in pgbouncer.ini
+- $ pgbouncer -d pgboucer.ini
 
 To launch website itself:
 - $ python manage.py runserver

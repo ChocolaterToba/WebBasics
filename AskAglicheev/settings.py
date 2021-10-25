@@ -86,11 +86,11 @@ WSGI_APPLICATION = 'AskAglicheev.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'Test',
+        'NAME': 'django_db',
         'USER' : 'mikhail',
         'PASSWORD' : 'iNtamnlgvwhItizg',
-        'HOST' : 'db-postgresql-fra1-13059-do-user-9873270-0.b.db.ondigitalocean.com',
-        'PORT' : '25061',
+        'HOST' : 'localhost',
+        'PORT' : '6432',
     }
 }
 
