@@ -13,7 +13,7 @@ Prepare database:
 - create file userlist.txt with database's username and password, for example
 - "thisismyusername" "this is my password"
 - generate ssl key and certificate, change related paths in pgbouncer.ini
-- $ pgbouncer -d pgboucer.ini
+- $ pgbouncer -d pgbouncer.ini
 
 To launch website itself:
 - $ python manage.py runserver
