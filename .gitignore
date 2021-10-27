@@ -7,5 +7,8 @@ __pycache__
 
 userlist.txt
 pgbouncer.pid
+pgbouncer.log
 server.key
 server.crt
+
+prometheus
