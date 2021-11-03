@@ -11,4 +11,4 @@ pgbouncer.log
 server.key
 server.crt
 
-prometheus
+prometheus_lib
